@@ -84,6 +84,10 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
         _newCategoryIcon.value = ""
         _newCategoryItems.value = List(5) { "" }
     }
+
+    suspend fun getCategoryById(id: Int): Category? {
+        return repository.getCategoryById(id)
+    }
 }
 
 class CategoryViewModelFactory(private val repository: CategoryRepository) : ViewModelProvider.Factory {

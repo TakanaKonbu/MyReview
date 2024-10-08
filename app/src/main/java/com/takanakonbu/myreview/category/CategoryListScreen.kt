@@ -1,5 +1,6 @@
 package com.takanakonbu.myreview.category
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,6 +27,7 @@ import com.takanakonbu.myreview.category.ui.CategoryViewModelFactory
 @Composable
 fun CategoryList(
     onAddCategory: () -> Unit,
+    onEditCategory: (Int) -> Unit,
     viewModel: CategoryViewModel = viewModel(
         factory = CategoryViewModelFactory(
             CategoryRepository(
@@ -42,7 +44,7 @@ fun CategoryList(
             contentPadding = PaddingValues(16.dp)
         ) {
             items(categories) { category ->
-                CategoryItem(category)
+                CategoryItem(category, onEditCategory)
             }
         }
 
@@ -59,11 +61,12 @@ fun CategoryList(
 }
 
 @Composable
-fun CategoryItem(category: Category) {
+fun CategoryItem(category: Category, onEditCategory: (Int) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable { onEditCategory(category.id) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(

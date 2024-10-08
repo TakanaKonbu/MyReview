@@ -1,30 +1,29 @@
 package com.takanakonbu.myreview.category
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.takanakonbu.myreview.category.data.CategoryRepository
+import com.takanakonbu.myreview.category.data.Category
 import com.takanakonbu.myreview.category.data.CategoryDatabase
+import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.category.ui.CategoryViewModel
 import com.takanakonbu.myreview.category.ui.CategoryViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddReviewScreen(
+fun EditCategoryScreen(
+    categoryId: Int,
     viewModel: CategoryViewModel = viewModel(
         factory = CategoryViewModelFactory(
             CategoryRepository(
@@ -34,9 +33,20 @@ fun AddReviewScreen(
     ),
     onNavigateBack: () -> Unit
 ) {
-    val name by viewModel.newCategoryName.collectAsState()
-    val icon by viewModel.newCategoryIcon.collectAsState()
-    val items by viewModel.newCategoryItems.collectAsState()
+    var category by remember { mutableStateOf<Category?>(null) }
+    var name by remember { mutableStateOf("") }
+    var icon by remember { mutableStateOf("") }
+    var items by remember { mutableStateOf(List(5) { "" }) }
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(categoryId) {
+        category = viewModel.getCategoryById(categoryId)
+        category?.let {
+            name = it.name
+            icon = it.icon
+            items = listOf(it.item1, it.item2 ?: "", it.item3 ?: "", it.item4 ?: "", it.item5 ?: "")
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -47,13 +57,12 @@ fun AddReviewScreen(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 16.dp)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // ジャンル入力フィールド
             OutlinedTextField(
                 value = name,
-                onValueChange = { viewModel.updateNewCategoryName(it) },
-                placeholder = { Text("ジャンルを追加") },
+                onValueChange = { name = it },
+                label = { Text("ジャンル名") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = Color(0xFF6D6DF6),
@@ -63,12 +72,10 @@ fun AddReviewScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // アイコン追加フィールド
-
             OutlinedTextField(
                 value = icon,
-                onValueChange = { viewModel.updateNewCategoryIcon(it) },
-                placeholder = { Text("アイコンを追加(絵文字)") },
+                onValueChange = { icon = it },
+                label = { Text("アイコン(絵文字)") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = Color(0xFF6D6DF6),
@@ -80,20 +87,20 @@ fun AddReviewScreen(
                 )
             )
 
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 評価項目の追加セクション
             Text(
-                "評価項目の追加(最大5個)\n最低1個は必須(1個のみの例：総合)",
+                "評価項目(最大5個)",
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             items.forEachIndexed { index, item ->
                 OutlinedTextField(
                     value = item,
-                    onValueChange = { viewModel.updateNewCategoryItem(index, it) },
-                    placeholder = { Text("評価項目の追加") },
+                    onValueChange = { newValue ->
+                        items = items.toMutableList().apply { this[index] = newValue }
+                    },
+                    label = { Text("評価項目 ${index + 1}") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp),
@@ -106,10 +113,20 @@ fun AddReviewScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // 保存ボタン
             Button(
                 onClick = {
-                    viewModel.insertCategory()
+                    category?.let {
+                        val updatedCategory = it.copy(
+                            name = name,
+                            icon = icon,
+                            item1 = items[0],
+                            item2 = items[1].takeIf { it.isNotBlank() },
+                            item3 = items[2].takeIf { it.isNotBlank() },
+                            item4 = items[3].takeIf { it.isNotBlank() },
+                            item5 = items[4].takeIf { it.isNotBlank() }
+                        )
+                        viewModel.updateCategory(updatedCategory)
+                    }
                     onNavigateBack()
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -123,16 +140,48 @@ fun AddReviewScreen(
             OutlinedButton(
                 onClick = onNavigateBack,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778))
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFD27778))
             ) {
                 Text("キャンセル", fontSize = 20.sp)
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 削除ボタン
+            Button(
+                onClick = { showDeleteConfirmDialog = true },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778))
+            ) {
+                Text("削除", color = Color.White, fontSize = 20.sp)
+            }
         }
     }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun AddReviewScreenPreview() {
-    AddReviewScreen(onNavigateBack = {})
+    // 削除確認ダイアログ
+    if (showDeleteConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmDialog = false },
+            title = { Text("カテゴリーの削除") },
+            text = { Text("このカテゴリーを削除してもよろしいですか？") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        category?.let {
+                            viewModel.deleteCategory(it)
+                        }
+                        showDeleteConfirmDialog = false
+                        onNavigateBack()
+                    }
+                ) {
+                    Text("削除", color = Color(0xFFD27778))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmDialog = false }) {
+                    Text("キャンセル")
+                }
+            }
+        )
+    }
 }

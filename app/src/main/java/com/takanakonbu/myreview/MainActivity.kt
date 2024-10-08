@@ -15,11 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.takanakonbu.myreview.category.AddReviewScreen
 import com.takanakonbu.myreview.category.CategoryList
+import com.takanakonbu.myreview.category.EditCategoryScreen
 import com.takanakonbu.myreview.ui.theme.MyReviewTheme
 
 class MainActivity : ComponentActivity() {
@@ -51,11 +54,24 @@ fun MyReviewApp() {
         ) {
             composable("category_list") {
                 CategoryList(
-                    onAddCategory = { navController.navigate("add_review") }
+                    onAddCategory = { navController.navigate("add_review") },
+                    onEditCategory = { categoryId ->
+                        navController.navigate("edit_category/$categoryId")
+                    }
                 )
             }
             composable("add_review") {
                 AddReviewScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+            composable(
+                "edit_category/{categoryId}",
+                arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
+                EditCategoryScreen(
+                    categoryId = categoryId,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
