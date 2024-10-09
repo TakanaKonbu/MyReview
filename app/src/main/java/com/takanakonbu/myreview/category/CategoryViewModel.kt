@@ -22,8 +22,7 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
     private val _newCategoryName = MutableStateFlow("")
     val newCategoryName: StateFlow<String> = _newCategoryName.asStateFlow()
 
-    private val _newCategoryIcon = MutableStateFlow("")
-    val newCategoryIcon: StateFlow<String> = _newCategoryIcon.asStateFlow()
+
 
     private val _newCategoryItems = MutableStateFlow(List(5) { "" })
     val newCategoryItems: StateFlow<List<String>> = _newCategoryItems.asStateFlow()
@@ -31,13 +30,11 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
     // カテゴリーを追加
     fun insertCategory() {
         val name = _newCategoryName.value
-        val icon = _newCategoryIcon.value
         val items = _newCategoryItems.value
 
-        if (name.isNotBlank() && icon.isNotBlank() && items.any { it.isNotBlank() }) {
+        if (name.isNotBlank() && items.any { it.isNotBlank() }) {
             val newCategory = Category(
                 name = name,
-                icon = icon,
                 item1 = items[0],
                 item2 = items[1].takeIf { it.isNotBlank() },
                 item3 = items[2].takeIf { it.isNotBlank() },
@@ -68,9 +65,7 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
         _newCategoryName.value = name
     }
 
-    fun updateNewCategoryIcon(icon: String) {
-        _newCategoryIcon.value = icon
-    }
+
 
     fun updateNewCategoryItem(index: Int, value: String) {
         _newCategoryItems.value = _newCategoryItems.value.toMutableList().apply {
@@ -81,7 +76,6 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
     // 入力フィールドをクリア
     private fun clearInputs() {
         _newCategoryName.value = ""
-        _newCategoryIcon.value = ""
         _newCategoryItems.value = List(5) { "" }
     }
 

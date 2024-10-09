@@ -35,7 +35,6 @@ fun EditCategoryScreen(
 ) {
     var category by remember { mutableStateOf<Category?>(null) }
     var name by remember { mutableStateOf("") }
-    var icon by remember { mutableStateOf("") }
     var items by remember { mutableStateOf(List(5) { "" }) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
 
@@ -43,7 +42,6 @@ fun EditCategoryScreen(
         category = viewModel.getCategoryById(categoryId)
         category?.let {
             name = it.name
-            icon = it.icon
             items = listOf(it.item1, it.item2 ?: "", it.item3 ?: "", it.item4 ?: "", it.item5 ?: "")
         }
     }
@@ -67,23 +65,6 @@ fun EditCategoryScreen(
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = Color(0xFF6D6DF6),
                     unfocusedBorderColor = Color.Gray
-                )
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = icon,
-                onValueChange = { icon = it },
-                label = { Text("アイコン(絵文字)") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF6D6DF6),
-                    unfocusedBorderColor = Color.Gray
-                ),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Ascii,
-                    imeAction = ImeAction.Done
                 )
             )
 
@@ -118,7 +99,6 @@ fun EditCategoryScreen(
                     category?.let {
                         val updatedCategory = it.copy(
                             name = name,
-                            icon = icon,
                             item1 = items[0],
                             item2 = items[1].takeIf { it.isNotBlank() },
                             item3 = items[2].takeIf { it.isNotBlank() },
@@ -132,7 +112,7 @@ fun EditCategoryScreen(
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D6DF6))
             ) {
-                Text("保存", color = Color.White, fontSize = 20.sp)
+                Text("更新", color = Color.White, fontSize = 20.sp)
             }
             Spacer(modifier = Modifier.height(8.dp))
 

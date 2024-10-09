@@ -35,7 +35,6 @@ fun AddReviewScreen(
     onNavigateBack: () -> Unit
 ) {
     val name by viewModel.newCategoryName.collectAsState()
-    val icon by viewModel.newCategoryIcon.collectAsState()
     val items by viewModel.newCategoryItems.collectAsState()
 
     Surface(
@@ -62,26 +61,6 @@ fun AddReviewScreen(
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            // アイコン追加フィールド
-
-            OutlinedTextField(
-                value = icon,
-                onValueChange = { viewModel.updateNewCategoryIcon(it) },
-                placeholder = { Text("アイコンを追加(絵文字)") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF6D6DF6),
-                    unfocusedBorderColor = Color.Gray
-                ),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Ascii,
-                    imeAction = ImeAction.Done
-                )
-            )
-
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // 評価項目の追加セクション
             Text(

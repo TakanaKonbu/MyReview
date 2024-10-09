@@ -70,11 +70,6 @@ fun CategoryItem(category: Category, onEditCategory: (Int) -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = category.icon,
-            fontSize = 24.sp,
-            modifier = Modifier.padding(end = 16.dp)
-        )
-        Text(
             text = "${category.name}",
             fontSize = 24.sp,
         )

@@ -8,7 +8,6 @@ import java.util.Date
 data class Category(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
-    val icon: String,
     val item1: String,
     val item2: String?,
     val item3: String?,
