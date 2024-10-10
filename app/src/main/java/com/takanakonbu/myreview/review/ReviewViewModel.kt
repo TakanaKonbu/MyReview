@@ -1,4 +1,4 @@
-package com.takanakonbu.myreview.category.review
+package com.takanakonbu.myreview.review
 
 import androidx.lifecycle.*
 import com.takanakonbu.myreview.review.data.Review

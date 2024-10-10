@@ -18,8 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.Category
-import com.takanakonbu.myreview.category.data.CategoryDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.category.ui.CategoryViewModel
 import com.takanakonbu.myreview.category.ui.CategoryViewModelFactory
@@ -31,7 +31,7 @@ fun CategoryList(
     viewModel: CategoryViewModel = viewModel(
         factory = CategoryViewModelFactory(
             CategoryRepository(
-                CategoryDatabase.getDatabase(LocalContext.current).categoryDao()
+                AppDatabase.getDatabase(LocalContext.current).categoryDao()
             )
         )
     )
