@@ -5,24 +5,27 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.takanakonbu.myreview.review.data.Review
+import com.takanakonbu.myreview.review.data.ReviewDao
 import java.util.Date
 
-@Database(entities = [Category::class], version = 1, exportSchema = false)
+@Database(entities = [Category::class, Review::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
-abstract class CategoryDatabase : RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
 
     abstract fun categoryDao(): CategoryDao
+    abstract fun reviewDao(): ReviewDao
 
     companion object {
         @Volatile
-        private var INSTANCE: CategoryDatabase? = null
+        private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context): CategoryDatabase {
+        fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    CategoryDatabase::class.java,
-                    "category_database"
+                    AppDatabase::class.java,
+                    "app_database"
                 )
                     .fallbackToDestructiveMigration()
                     .build()
