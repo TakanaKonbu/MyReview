@@ -3,9 +3,7 @@ package com.takanakonbu.myreview.review
 import androidx.lifecycle.*
 import com.takanakonbu.myreview.review.data.Review
 import com.takanakonbu.myreview.review.data.ReviewRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ReviewViewModel(private val repository: ReviewRepository) : ViewModel() {
@@ -19,30 +17,41 @@ class ReviewViewModel(private val repository: ReviewRepository) : ViewModel() {
     private val _showOnlyFavorites = MutableStateFlow(false)
     val showOnlyFavorites: StateFlow<Boolean> = _showOnlyFavorites.asStateFlow()
 
-    init {
-        loadReviews()
-    }
+    private val _currentCategoryId = MutableStateFlow<Int?>(null)
 
-    private fun loadReviews() {
+    init {
         viewModelScope.launch {
-            repository.getAllReviews().collect { reviews ->
-                _reviews.value = when {
-                    showOnlyFavorites.value -> reviews.filter { it.favorite }
-                    sortOrder.value == SortOrder.OLDEST_FIRST -> reviews.sortedBy { it.createdDate }
-                    else -> reviews.sortedByDescending { it.createdDate }
+            combine(
+                repository.getAllReviews(),
+                _sortOrder,
+                _showOnlyFavorites,
+                _currentCategoryId
+            ) { reviews, sortOrder, showOnlyFavorites, categoryId ->
+                reviews.filter { review ->
+                    (categoryId == null || review.categoryId == categoryId) &&
+                            (!showOnlyFavorites || review.favorite)
+                }.let { filteredReviews ->
+                    when (sortOrder) {
+                        SortOrder.NEWEST_FIRST -> filteredReviews.sortedByDescending { it.createdDate }
+                        SortOrder.OLDEST_FIRST -> filteredReviews.sortedBy { it.createdDate }
+                    }
                 }
+            }.collect { sortedAndFilteredReviews ->
+                _reviews.value = sortedAndFilteredReviews
             }
         }
     }
 
+    fun loadReviewsForCategory(categoryId: Int) {
+        _currentCategoryId.value = categoryId
+    }
+
     fun setSortOrder(order: SortOrder) {
         _sortOrder.value = order
-        loadReviews()
     }
 
     fun setShowOnlyFavorites(show: Boolean) {
         _showOnlyFavorites.value = show
-        loadReviews()
     }
 
     fun insertReview(review: Review) = viewModelScope.launch {

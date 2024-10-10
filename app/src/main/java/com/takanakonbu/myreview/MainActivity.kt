@@ -23,6 +23,7 @@ import androidx.navigation.navArgument
 import com.takanakonbu.myreview.category.AddReviewScreen
 import com.takanakonbu.myreview.category.CategoryList
 import com.takanakonbu.myreview.category.EditCategoryScreen
+import com.takanakonbu.myreview.review.ReviewScreen
 import com.takanakonbu.myreview.ui.theme.MyReviewTheme
 
 class MainActivity : ComponentActivity() {
@@ -57,6 +58,9 @@ fun MyReviewApp() {
                     onAddCategory = { navController.navigate("add_review") },
                     onEditCategory = { categoryId ->
                         navController.navigate("edit_category/$categoryId")
+                    },
+                    onCategorySelected = { categoryId, categoryName ->
+                        navController.navigate("review_list/$categoryId/$categoryName")
                     }
                 )
             }
@@ -72,6 +76,21 @@ fun MyReviewApp() {
                 val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
                 EditCategoryScreen(
                     categoryId = categoryId,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+            composable(
+                "review_list/{categoryId}/{categoryName}",
+                arguments = listOf(
+                    navArgument("categoryId") { type = NavType.IntType },
+                    navArgument("categoryName") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
+                val categoryName = backStackEntry.arguments?.getString("categoryName") ?: return@composable
+                ReviewScreen(
+                    categoryId = categoryId,
+                    categoryName = categoryName,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
