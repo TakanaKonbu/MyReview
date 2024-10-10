@@ -4,20 +4,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.takanakonbu.myreview.category.AddReviewScreen
@@ -38,13 +38,44 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyReviewApp() {
     val navController = rememberNavController()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+
+    val currentScreen = remember(currentBackStackEntry) {
+        currentBackStackEntry?.destination?.route ?: "category_list"
+    }
+
+    val currentTitle = remember(currentBackStackEntry) {
+        when {
+            currentScreen.startsWith("review_list") ->
+                currentBackStackEntry?.arguments?.getString("categoryName") ?: "My Review"
+            else -> "My Review"
+        }
+    }
+
+    val showBackButton = currentScreen != "category_list"
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { TopBar() }
+        topBar = {
+            TopBar(
+                title = currentTitle,
+                showBackButton = showBackButton,
+                onBackClick = { navController.popBackStack() },
+                actions = {
+                    IconButton(onClick = { /* 設定画面に遷移するロジックをここに追加 */ }) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            tint = Color.White
+                        )
+                    }
+                }
+            )
+        }
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -100,35 +131,28 @@ fun MyReviewApp() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar() {
+fun TopBar(
+    title: String,
+    showBackButton: Boolean = false,
+    onBackClick: () -> Unit = {},
+    actions: @Composable (RowScope.() -> Unit) = {}
+) {
     TopAppBar(
-        title = {
-            Text(
-                text = "My Review",
-                color = Color.White,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start
-            )
-        },
-        actions = {
-            IconButton(onClick = { /* 設定画面に遷移するロジックをここに追加 */ }) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
-                    tint = Color.White
-                )
+        title = { Text(text = title, color = Color.White) },
+        navigationIcon = {
+            if (showBackButton) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
             }
         },
+        actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color(0xFF6D6DF6)
         )
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TopBarPreview() {
-    MyReviewTheme {
-        TopBar()
-    }
 }

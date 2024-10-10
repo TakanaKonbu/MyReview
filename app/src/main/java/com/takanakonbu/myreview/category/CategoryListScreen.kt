@@ -94,12 +94,7 @@ fun CategoryItem(
             }
         }
 
-        // 評価項目の表示
-        category.item1.let { Text(text = "- $it", fontSize = 14.sp) }
-        category.item2?.let { Text(text = "- $it", fontSize = 14.sp) }
-        category.item3?.let { Text(text = "- $it", fontSize = 14.sp) }
-        category.item4?.let { Text(text = "- $it", fontSize = 14.sp) }
-        category.item5?.let { Text(text = "- $it", fontSize = 14.sp) }
+
     }
     Divider(color = Color.LightGray, thickness = 1.dp)
 }
