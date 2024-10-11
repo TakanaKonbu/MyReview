@@ -1,5 +1,6 @@
 package com.takanakonbu.myreview.review
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,10 +17,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.takanakonbu.myreview.category.data.AppDatabase
+import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.Review
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 
 @Composable
 fun ReviewScreen(
@@ -29,9 +31,8 @@ fun ReviewScreen(
     navController: NavController,
     viewModel: ReviewViewModel = viewModel(
         factory = ReviewViewModelFactory(
-            ReviewRepository(
-                AppDatabase.getDatabase(LocalContext.current).reviewDao()
-            )
+            ReviewRepository(AppDatabase.getDatabase(LocalContext.current).reviewDao()),
+            CategoryRepository(AppDatabase.getDatabase(LocalContext.current).categoryDao())
         )
     )
 ) {
@@ -72,7 +73,12 @@ fun ReviewScreen(
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     items(reviews) { review ->
-                        ReviewItem(review)
+                        ReviewItem(
+                            review = review,
+                            onClick = {
+                                navController.navigate("review_detail/${review.id}")
+                            }
+                        )
                     }
                 }
             }
@@ -81,11 +87,12 @@ fun ReviewScreen(
 }
 
 @Composable
-fun ReviewItem(review: Review) {
+fun ReviewItem(review: Review, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -112,7 +119,7 @@ fun ReviewItem(review: Review) {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 総評の計算と表示
+            // Calculate average score
             val averageScore = listOfNotNull(
                 review.itemScore1,
                 review.itemScore2,
@@ -120,6 +127,7 @@ fun ReviewItem(review: Review) {
                 review.itemScore4,
                 review.itemScore5
             ).average()
+
             Text(
                 text = "総評: ${String.format("%.1f", averageScore)}",
                 style = MaterialTheme.typography.bodyLarge,
@@ -133,7 +141,6 @@ fun ReviewItem(review: Review) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
-
         }
     }
 }

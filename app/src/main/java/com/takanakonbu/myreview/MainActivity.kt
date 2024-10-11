@@ -25,6 +25,7 @@ import com.takanakonbu.myreview.category.EditCategoryScreen
 import com.takanakonbu.myreview.review.AddReviewScreen as ReviewAddScreen
 import com.takanakonbu.myreview.category.AddReviewScreen as CategoryAddScreen
 import com.takanakonbu.myreview.review.ReviewScreen
+import com.takanakonbu.myreview.review.ReviewDetailScreen
 import com.takanakonbu.myreview.ui.theme.MyReviewTheme
 
 class MainActivity : ComponentActivity() {
@@ -53,6 +54,8 @@ fun MyReviewApp() {
         when {
             currentScreen.startsWith("review_list") ->
                 currentBackStackEntry?.arguments?.getString("categoryName") ?: "My Review"
+            currentScreen.startsWith("review_detail") ->
+                "レビュー詳細" // このタイトルは後でReviewViewModelから取得したレビュー名に更新します
             else -> "My Review"
         }
     }
@@ -130,6 +133,16 @@ fun MyReviewApp() {
                     categoryName = categoryName,
                     onNavigateBack = { navController.popBackStack() },
                     navController = navController
+                )
+            }
+            composable(
+                "review_detail/{reviewId}",
+                arguments = listOf(navArgument("reviewId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val reviewId = backStackEntry.arguments?.getInt("reviewId") ?: return@composable
+                ReviewDetailScreen(
+                    reviewId = reviewId,
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
         }

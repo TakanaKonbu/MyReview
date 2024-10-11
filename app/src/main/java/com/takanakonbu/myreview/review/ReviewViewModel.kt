@@ -1,12 +1,17 @@
 package com.takanakonbu.myreview.review
 
 import androidx.lifecycle.*
+import com.takanakonbu.myreview.category.data.Category
+import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.Review
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class ReviewViewModel(private val repository: ReviewRepository) : ViewModel() {
+class ReviewViewModel(
+    private val reviewRepository: ReviewRepository,
+    private val categoryRepository: CategoryRepository
+) : ViewModel() {
 
     private val _reviews = MutableStateFlow<List<Review>>(emptyList())
     val reviews: StateFlow<List<Review>> = _reviews.asStateFlow()
@@ -19,10 +24,16 @@ class ReviewViewModel(private val repository: ReviewRepository) : ViewModel() {
 
     private val _currentCategoryId = MutableStateFlow<Int?>(null)
 
+    private val _selectedReview = MutableStateFlow<Review?>(null)
+    val selectedReview: StateFlow<Review?> = _selectedReview.asStateFlow()
+
+    private val _selectedCategory = MutableStateFlow<Category?>(null)
+    val selectedCategory: StateFlow<Category?> = _selectedCategory.asStateFlow()
+
     init {
         viewModelScope.launch {
             combine(
-                repository.getAllReviews(),
+                reviewRepository.getAllReviews(),
                 _sortOrder,
                 _showOnlyFavorites,
                 _currentCategoryId
@@ -55,19 +66,25 @@ class ReviewViewModel(private val repository: ReviewRepository) : ViewModel() {
     }
 
     fun insertReview(review: Review) = viewModelScope.launch {
-        repository.insertReview(review)
+        reviewRepository.insertReview(review)
     }
 
     fun updateReview(review: Review) = viewModelScope.launch {
-        repository.updateReview(review)
+        reviewRepository.updateReview(review)
     }
 
     fun deleteReview(review: Review) = viewModelScope.launch {
-        repository.deleteReview(review)
+        reviewRepository.deleteReview(review)
     }
 
-    suspend fun getReviewById(id: Int): Review? {
-        return repository.getReviewById(id)
+    fun loadReviewById(id: Int) {
+        viewModelScope.launch {
+            val review = reviewRepository.getReviewById(id)
+            _selectedReview.value = review
+            review?.let {
+                _selectedCategory.value = categoryRepository.getCategoryById(it.categoryId)
+            }
+        }
     }
 }
 
@@ -76,11 +93,14 @@ enum class SortOrder {
     OLDEST_FIRST
 }
 
-class ReviewViewModelFactory(private val repository: ReviewRepository) : ViewModelProvider.Factory {
+class ReviewViewModelFactory(
+    private val reviewRepository: ReviewRepository,
+    private val categoryRepository: CategoryRepository
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ReviewViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return ReviewViewModel(repository) as T
+            return ReviewViewModel(reviewRepository, categoryRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
