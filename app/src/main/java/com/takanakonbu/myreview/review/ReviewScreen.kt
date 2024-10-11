@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -88,11 +89,41 @@ fun ReviewItem(review: Review) {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(text = review.name, style = MaterialTheme.typography.titleLarge)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = review.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f)
+                )
+                if (review.favorite) {
+                    Icon(
+                        Icons.Filled.Favorite,
+                        contentDescription = "Favorite",
+                        tint = Color.Red,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "評価: ${review.itemScore1}", style = MaterialTheme.typography.bodyMedium)
+
+            // 総評の計算と表示
+            val averageScore = listOfNotNull(
+                review.itemScore1,
+                review.itemScore2,
+                review.itemScore3,
+                review.itemScore4,
+                review.itemScore5
+            ).average()
+            Text(
+                text = "総評: ${String.format("%.1f", averageScore)}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color(0xFF6D6DF6)
+            )
+
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = review.review, style = MaterialTheme.typography.bodyMedium)
+
         }
     }
 }

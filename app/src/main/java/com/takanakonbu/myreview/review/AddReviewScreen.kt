@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.takanakonbu.myreview.category.data.AppDatabase
@@ -77,10 +78,12 @@ fun AddReviewScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 画像選択ボタンと選択された画像の表示
         Button(
             onClick = { launcher.launch("image/*") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF6D6DF6)
+            )
         ) {
             Text("画像を選択")
         }
@@ -149,13 +152,30 @@ fun AddReviewScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         selectedCategory?.let { category ->
-            listOfNotNull(
+            val items = listOfNotNull(
                 category.item1,
                 category.item2,
                 category.item3,
                 category.item4,
                 category.item5
-            ).forEach { item ->
+            )
+
+            // 総評の計算と表示
+            val averageScore = if (itemScores.isNotEmpty()) {
+                itemScores.values.average().toFloat()
+            } else {
+                0f
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "総評: ${String.format("%.1f", averageScore)}",
+                color = Color(0xFF6D6DF6),
+                fontSize = 32.sp
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            items.forEach { item ->
                 Text(text = "$item: ${itemScores[item]?.toInt() ?: 1}")
                 Slider(
                     value = itemScores[item] ?: 1f,
