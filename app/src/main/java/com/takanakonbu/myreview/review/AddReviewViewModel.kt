@@ -1,5 +1,5 @@
-package com.takanakonbu.myreview.review
-
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -7,13 +7,19 @@ import com.takanakonbu.myreview.category.data.Category
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.Review
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.util.Date
+import java.util.UUID
 
 class AddReviewViewModel(
+    private val context: Context,
     private val categoryRepository: CategoryRepository,
     private val reviewRepository: ReviewRepository
 ) : ViewModel() {
@@ -137,24 +143,48 @@ class AddReviewViewModel(
         }
     }
 
+    private suspend fun saveImageToInternalStorage(uri: Uri): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val fileName = "review_image_${UUID.randomUUID()}.jpg"
+                val outputFile = File(context.filesDir, fileName)
+                inputStream?.use { input ->
+                    FileOutputStream(outputFile).use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                outputFile.absolutePath
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
     fun saveReview() {
-        val selectedCategory = _selectedCategory.value ?: return
-        val review = Review(
-            id = editingReviewId ?: 0, // Use 0 for new reviews, existing id for edits
-            name = title.value,
-            favorite = isFavorite.value,
-            image = imageUri.value,
-            categoryId = selectedCategory.id,
-            genre = genre.value,
-            review = review.value,
-            itemScore1 = itemScores.value[selectedCategory.item1]?.toDouble() ?: 0.0,
-            itemScore2 = selectedCategory.item2?.let { itemScores.value[it]?.toDouble() },
-            itemScore3 = selectedCategory.item3?.let { itemScores.value[it]?.toDouble() },
-            itemScore4 = selectedCategory.item4?.let { itemScores.value[it]?.toDouble() },
-            itemScore5 = selectedCategory.item5?.let { itemScores.value[it]?.toDouble() },
-            createdDate = Date()
-        )
         viewModelScope.launch {
+            val imagePath = imageUri.value?.let { uri ->
+                saveImageToInternalStorage(Uri.parse(uri))
+            }
+
+            val selectedCategory = _selectedCategory.value ?: return@launch
+            val review = Review(
+                id = editingReviewId ?: 0,
+                name = title.value,
+                favorite = isFavorite.value,
+                image = imagePath,
+                categoryId = selectedCategory.id,
+                genre = genre.value,
+                review = review.value,
+                itemScore1 = itemScores.value[selectedCategory.item1]?.toDouble() ?: 0.0,
+                itemScore2 = selectedCategory.item2?.let { itemScores.value[it]?.toDouble() },
+                itemScore3 = selectedCategory.item3?.let { itemScores.value[it]?.toDouble() },
+                itemScore4 = selectedCategory.item4?.let { itemScores.value[it]?.toDouble() },
+                itemScore5 = selectedCategory.item5?.let { itemScores.value[it]?.toDouble() },
+                createdDate = Date()
+            )
+
             if (_isEditMode.value) {
                 reviewRepository.updateReview(review)
             } else {
@@ -165,13 +195,14 @@ class AddReviewViewModel(
 }
 
 class AddReviewViewModelFactory(
+    private val context: Context,
     private val categoryRepository: CategoryRepository,
     private val reviewRepository: ReviewRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AddReviewViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AddReviewViewModel(categoryRepository, reviewRepository) as T
+            return AddReviewViewModel(context, categoryRepository, reviewRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
