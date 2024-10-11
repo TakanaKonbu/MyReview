@@ -18,6 +18,8 @@ import androidx.navigation.NavController
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.review.data.Review
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun ReviewScreen(
@@ -40,6 +42,8 @@ fun ReviewScreen(
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate("add_review") },
@@ -123,6 +127,12 @@ fun ReviewItem(review: Review) {
             )
 
             Spacer(modifier = Modifier.height(4.dp))
+            val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+            Text(
+                text = dateFormat.format(review.createdDate),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
+            )
 
         }
     }
