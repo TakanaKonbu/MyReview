@@ -22,6 +22,7 @@ import coil.compose.AsyncImage
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -182,12 +183,18 @@ fun AddReviewScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             items.forEach { item ->
-                Text(text = "$item: ${itemScores[item]?.toInt() ?: 1}")
+                val score = itemScores[item] ?: 1f
+                val roundedScore = (score * 2).roundToInt() / 2f
+
+                Text(text = "$item: ${String.format("%.1f", roundedScore)}")
                 Slider(
-                    value = itemScores[item] ?: 1f,
-                    onValueChange = { viewModel.setItemScore(item, it) },
+                    value = score,
+                    onValueChange = { newValue ->
+                        val steppedValue = (newValue * 2).roundToInt() / 2f
+                        viewModel.setItemScore(item, steppedValue)
+                    },
                     valueRange = 1f..5f,
-                    steps = 3,
+                    steps = 8,
                     colors = SliderDefaults.colors(
                         thumbColor = Color(0xFF6D6DF6),
                         activeTrackColor = Color(0xFF6D6DF6),
