@@ -109,16 +109,7 @@ fun MyReviewApp() {
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
-            composable(
-                "edit_category/{categoryId}",
-                arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
-            ) { backStackEntry ->
-                val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
-                EditCategoryScreen(
-                    categoryId = categoryId,
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
+
             composable(
                 "review_list/{categoryId}/{categoryName}",
                 arguments = listOf(
@@ -142,6 +133,17 @@ fun MyReviewApp() {
                 val reviewId = backStackEntry.arguments?.getInt("reviewId") ?: return@composable
                 ReviewDetailScreen(
                     reviewId = reviewId,
+                    onNavigateBack = { navController.popBackStack() },
+                    navController = navController
+                )
+            }
+            composable(
+                "edit_category/{categoryId}",
+                arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
+                EditCategoryScreen(
+                    categoryId = categoryId,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

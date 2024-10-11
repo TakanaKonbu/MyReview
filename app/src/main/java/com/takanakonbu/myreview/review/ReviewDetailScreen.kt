@@ -12,6 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.takanakonbu.myreview.category.data.AppDatabase
@@ -24,6 +25,7 @@ import java.util.*
 fun ReviewDetailScreen(
     reviewId: Int,
     onNavigateBack: () -> Unit,
+    navController: NavController,
     viewModel: ReviewViewModel = viewModel(
         factory = ReviewViewModelFactory(
             ReviewRepository(AppDatabase.getDatabase(LocalContext.current).reviewDao()),
@@ -33,6 +35,7 @@ fun ReviewDetailScreen(
 ) {
     val review by viewModel.selectedReview.collectAsState()
     val category by viewModel.selectedCategory.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(reviewId) {
         viewModel.loadReviewById(reviewId)
@@ -45,7 +48,8 @@ fun ReviewDetailScreen(
                 .padding(16.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = reviewData.name,
@@ -64,6 +68,24 @@ fun ReviewDetailScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Calculate and display average score
+            val averageScore = listOfNotNull(
+                reviewData.itemScore1,
+                reviewData.itemScore2,
+                reviewData.itemScore3,
+                reviewData.itemScore4,
+                reviewData.itemScore5
+            ).average()
+
+            Text(
+                text = "総評: ${String.format("%.1f", averageScore)}",
+                style = MaterialTheme.typography.titleLarge,
+                color = Color(0xFF6D6DF6)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Display image if available
             reviewData.image?.let { imageUri ->
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -126,6 +148,52 @@ fun ReviewDetailScreen(
             Text(
                 text = reviewData.review,
                 style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Edit and Delete buttons
+
+            Button(
+                onClick = { /* TODO: Implement edit functionality */ },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D6DF6)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("編集")
+            }
+            Button(
+                onClick = { showDeleteDialog = true },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("削除")
+            }
+        }
+
+
+        // Delete confirmation dialog
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("レビューの削除") },
+                text = { Text("このレビューを削除してもよろしいですか？") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.deleteReview(reviewData)
+                            showDeleteDialog = false
+                            onNavigateBack()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    ) {
+                        Text("削除")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDeleteDialog = false }) {
+                        Text("キャンセル")
+                    }
+                }
             )
         }
     }
