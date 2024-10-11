@@ -20,9 +20,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.takanakonbu.myreview.category.AddReviewScreen
 import com.takanakonbu.myreview.category.CategoryList
 import com.takanakonbu.myreview.category.EditCategoryScreen
+import com.takanakonbu.myreview.review.AddReviewScreen as ReviewAddScreen
+import com.takanakonbu.myreview.category.AddReviewScreen as CategoryAddScreen
 import com.takanakonbu.myreview.review.ReviewScreen
 import com.takanakonbu.myreview.ui.theme.MyReviewTheme
 
@@ -86,7 +87,7 @@ fun MyReviewApp() {
         ) {
             composable("category_list") {
                 CategoryList(
-                    onAddCategory = { navController.navigate("add_review") },
+                    onAddCategory = { navController.navigate("add_category") },
                     onEditCategory = { categoryId ->
                         navController.navigate("edit_category/$categoryId")
                     },
@@ -95,8 +96,13 @@ fun MyReviewApp() {
                     }
                 )
             }
+            composable("add_category") {
+                CategoryAddScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
             composable("add_review") {
-                AddReviewScreen(
+                ReviewAddScreen(
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
@@ -122,7 +128,8 @@ fun MyReviewApp() {
                 ReviewScreen(
                     categoryId = categoryId,
                     categoryName = categoryName,
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = { navController.popBackStack() },
+                    navController = navController
                 )
             }
         }

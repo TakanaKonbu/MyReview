@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.review.data.Review
 import com.takanakonbu.myreview.review.data.ReviewRepository
@@ -22,6 +23,7 @@ fun ReviewScreen(
     categoryId: Int,
     categoryName: String,
     onNavigateBack: () -> Unit,
+    navController: NavController,
     viewModel: ReviewViewModel = viewModel(
         factory = ReviewViewModelFactory(
             ReviewRepository(
@@ -39,7 +41,7 @@ fun ReviewScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* クリック処理はここに追加 */ },
+                onClick = { navController.navigate("add_review") },
                 containerColor = Color(0xFF6D6DF6),
                 contentColor = Color.White
             ) {
