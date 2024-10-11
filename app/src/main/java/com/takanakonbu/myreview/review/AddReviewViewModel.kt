@@ -45,6 +45,11 @@ class AddReviewViewModel(
     private val _imageUri = MutableStateFlow<String?>(null)
     val imageUri: StateFlow<String?> = _imageUri.asStateFlow()
 
+    private val _isEditMode = MutableStateFlow(false)
+    val isEditMode: StateFlow<Boolean> = _isEditMode.asStateFlow()
+
+    private var editingReviewId: Int? = null
+
     init {
         loadCategories()
     }
@@ -88,7 +93,7 @@ class AddReviewViewModel(
         _itemScores.value = _itemScores.value.toMutableMap().apply { this[item] = score }
     }
 
-    fun setImageUri(uri: String) {
+    fun setImageUri(uri: String?) {
         _imageUri.value = uri
     }
 
@@ -102,9 +107,40 @@ class AddReviewViewModel(
         ).toMap()
     }
 
+    fun loadReviewForEditing(reviewId: Int) {
+        viewModelScope.launch {
+            val review = reviewRepository.getReviewById(reviewId)
+            review?.let {
+                _isEditMode.value = true
+                editingReviewId = it.id
+                _title.value = it.name
+                _isFavorite.value = it.favorite
+                _selectedCategoryId.value = it.categoryId
+                _genre.value = it.genre ?: ""
+                _review.value = it.review
+                _imageUri.value = it.image
+
+                // Load category and update item scores
+                _selectedCategory.value = categoryRepository.getCategoryById(it.categoryId)
+                updateItemScores(_selectedCategory.value ?: return@launch, review)
+            }
+        }
+    }
+
+    private fun updateItemScores(category: Category, review: Review) {
+        _itemScores.value = buildMap {
+            put(category.item1, review.itemScore1.toFloat())
+            category.item2?.let { put(it, review.itemScore2?.toFloat() ?: 3f) }
+            category.item3?.let { put(it, review.itemScore3?.toFloat() ?: 3f) }
+            category.item4?.let { put(it, review.itemScore4?.toFloat() ?: 3f) }
+            category.item5?.let { put(it, review.itemScore5?.toFloat() ?: 3f) }
+        }
+    }
+
     fun saveReview() {
         val selectedCategory = _selectedCategory.value ?: return
         val review = Review(
+            id = editingReviewId ?: 0, // Use 0 for new reviews, existing id for edits
             name = title.value,
             favorite = isFavorite.value,
             image = imageUri.value,
@@ -119,7 +155,11 @@ class AddReviewViewModel(
             createdDate = Date()
         )
         viewModelScope.launch {
-            reviewRepository.insertReview(review)
+            if (_isEditMode.value) {
+                reviewRepository.updateReview(review)
+            } else {
+                reviewRepository.insertReview(review)
+            }
         }
     }
 }

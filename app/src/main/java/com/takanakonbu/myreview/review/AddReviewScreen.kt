@@ -27,6 +27,7 @@ import com.takanakonbu.myreview.review.data.ReviewRepository
 @Composable
 fun AddReviewScreen(
     onNavigateBack: () -> Unit,
+    reviewId: Int? = null,
     viewModel: AddReviewViewModel = viewModel(
         factory = AddReviewViewModelFactory(
             CategoryRepository(AppDatabase.getDatabase(LocalContext.current).categoryDao()),
@@ -43,6 +44,7 @@ fun AddReviewScreen(
     val categories by viewModel.categories.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val imageUri by viewModel.imageUri.collectAsState()
+    val isEditMode by viewModel.isEditMode.collectAsState()
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -50,6 +52,10 @@ fun AddReviewScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { viewModel.setImageUri(it.toString()) }
+    }
+
+    LaunchedEffect(reviewId) {
+        reviewId?.let { viewModel.loadReviewForEditing(it) }
     }
 
     Column(
@@ -71,7 +77,7 @@ fun AddReviewScreen(
                 Icon(
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                     contentDescription = "Favorite",
-                    tint = if (isFavorite) Color.Black else Color.Gray
+                    tint = if (isFavorite) Color.Red else Color.Gray
                 )
             }
         }
@@ -204,7 +210,7 @@ fun AddReviewScreen(
                 containerColor = Color(0xFF6D6DF6)
             )
         ) {
-            Text("保存")
+            Text(if (isEditMode) "更新" else "保存")
         }
     }
 }

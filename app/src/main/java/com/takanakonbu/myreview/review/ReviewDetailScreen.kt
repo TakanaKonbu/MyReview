@@ -153,14 +153,16 @@ fun ReviewDetailScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Edit and Delete buttons
-
             Button(
-                onClick = { /* TODO: Implement edit functionality */ },
+                onClick = { navController.navigate("edit_review/$reviewId") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D6DF6)),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("編集")
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Button(
                 onClick = { showDeleteDialog = true },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778)),
@@ -169,7 +171,6 @@ fun ReviewDetailScreen(
                 Text("削除")
             }
         }
-
 
         // Delete confirmation dialog
         if (showDeleteDialog) {

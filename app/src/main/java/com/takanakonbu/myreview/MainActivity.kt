@@ -55,7 +55,11 @@ fun MyReviewApp() {
             currentScreen.startsWith("review_list") ->
                 currentBackStackEntry?.arguments?.getString("categoryName") ?: "My Review"
             currentScreen.startsWith("review_detail") ->
-                "レビュー詳細" // このタイトルは後でReviewViewModelから取得したレビュー名に更新します
+                "レビュー詳細"
+            currentScreen.startsWith("add_review") ->
+                "レビュー追加"
+            currentScreen.startsWith("edit_review") ->
+                "レビュー編集"
             else -> "My Review"
         }
     }
@@ -99,13 +103,20 @@ fun MyReviewApp() {
                     }
                 )
             }
+
             composable("add_category") {
                 CategoryAddScreen(
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
-            composable("add_review") {
-                ReviewAddScreen(
+
+            composable(
+                "edit_category/{categoryId}",
+                arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
+                EditCategoryScreen(
+                    categoryId = categoryId,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
@@ -126,6 +137,7 @@ fun MyReviewApp() {
                     navController = navController
                 )
             }
+
             composable(
                 "review_detail/{reviewId}",
                 arguments = listOf(navArgument("reviewId") { type = NavType.IntType })
@@ -137,14 +149,21 @@ fun MyReviewApp() {
                     navController = navController
                 )
             }
-            composable(
-                "edit_category/{categoryId}",
-                arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
-            ) { backStackEntry ->
-                val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
-                EditCategoryScreen(
-                    categoryId = categoryId,
+
+            composable("add_review") {
+                ReviewAddScreen(
                     onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                "edit_review/{reviewId}",
+                arguments = listOf(navArgument("reviewId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val reviewId = backStackEntry.arguments?.getInt("reviewId") ?: return@composable
+                ReviewAddScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    reviewId = reviewId
                 )
             }
         }
