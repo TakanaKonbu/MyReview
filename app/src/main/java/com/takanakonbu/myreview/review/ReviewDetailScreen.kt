@@ -133,8 +133,8 @@ fun ReviewDetailScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "評価:",
-                    style = MaterialTheme.typography.titleMedium
+                    text = "評価",
+                    style = MaterialTheme.typography.titleLarge
                 )
 
                 category?.let { cat ->
@@ -157,8 +157,8 @@ fun ReviewDetailScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "レビュー:",
-                    style = MaterialTheme.typography.titleMedium
+                    text = "レビュー",
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Text(
                     text = reviewData.review,
