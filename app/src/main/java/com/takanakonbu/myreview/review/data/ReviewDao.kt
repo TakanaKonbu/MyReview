@@ -25,4 +25,16 @@ interface ReviewDao {
 
     @Query("SELECT * FROM reviews WHERE id = :reviewId")
     suspend fun getReviewById(reviewId: Int): Review?
+
+    @Query("SELECT * FROM reviews WHERE name LIKE '%' || :query || '%'")
+    fun searchReviews(query: String): Flow<List<Review>>
+
+    @Query("SELECT * FROM reviews ORDER BY (itemScore1 + itemScore2 + itemScore3 + itemScore4 + itemScore5) / 5 ASC")
+    fun getReviewsSortedByRatingAsc(): Flow<List<Review>>
+
+    @Query("SELECT * FROM reviews ORDER BY (itemScore1 + itemScore2 + itemScore3 + itemScore4 + itemScore5) / 5 DESC")
+    fun getReviewsSortedByRatingDesc(): Flow<List<Review>>
+
+    @Query("SELECT * FROM reviews WHERE categoryId = :categoryId AND name LIKE '%' || :query || '%'")
+    suspend fun searchReviewsInCategory(categoryId: Int, query: String): List<Review>
 }

@@ -25,4 +25,14 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
     suspend fun getReviewById(id: Int): Review? {
         return reviewDao.getReviewById(id)
     }
+
+    fun searchReviews(query: String): Flow<List<Review>> = reviewDao.searchReviews(query)
+
+    fun getReviewsSortedByRating(ascending: Boolean): Flow<List<Review>> =
+        if (ascending) reviewDao.getReviewsSortedByRatingAsc()
+        else reviewDao.getReviewsSortedByRatingDesc()
+
+    suspend fun searchReviewsInCategory(categoryId: Int, query: String): List<Review> {
+        return reviewDao.searchReviewsInCategory(categoryId, query)
+    }
 }

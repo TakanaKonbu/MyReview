@@ -1,5 +1,3 @@
-package com.takanakonbu.myreview.review
-
 import androidx.lifecycle.*
 import com.takanakonbu.myreview.category.data.Category
 import com.takanakonbu.myreview.category.data.CategoryRepository
@@ -7,6 +5,13 @@ import com.takanakonbu.myreview.review.data.Review
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
+enum class SortOrder {
+    NEWEST_FIRST,
+    OLDEST_FIRST,
+    HIGHEST_RATED,
+    LOWEST_RATED
+}
 
 class ReviewViewModel(
     private val reviewRepository: ReviewRepository,
@@ -45,6 +50,8 @@ class ReviewViewModel(
                     when (sortOrder) {
                         SortOrder.NEWEST_FIRST -> filteredReviews.sortedByDescending { it.createdDate }
                         SortOrder.OLDEST_FIRST -> filteredReviews.sortedBy { it.createdDate }
+                        SortOrder.HIGHEST_RATED -> filteredReviews.sortedByDescending { it.calculateAverageScore() }
+                        SortOrder.LOWEST_RATED -> filteredReviews.sortedBy { it.calculateAverageScore() }
                     }
                 }
             }.collect { sortedAndFilteredReviews ->
@@ -63,6 +70,18 @@ class ReviewViewModel(
 
     fun setShowOnlyFavorites(show: Boolean) {
         _showOnlyFavorites.value = show
+    }
+
+    fun searchReviews(query: String) {
+        viewModelScope.launch {
+            _reviews.value = reviewRepository.searchReviews(query).first()
+        }
+    }
+
+    fun searchReviewsInCategory(categoryId: Int, query: String) {
+        viewModelScope.launch {
+            _reviews.value = reviewRepository.searchReviewsInCategory(categoryId, query)
+        }
     }
 
     fun insertReview(review: Review) = viewModelScope.launch {
@@ -86,11 +105,11 @@ class ReviewViewModel(
             }
         }
     }
-}
 
-enum class SortOrder {
-    NEWEST_FIRST,
-    OLDEST_FIRST
+    private fun Review.calculateAverageScore(): Float {
+        val scores = listOfNotNull(itemScore1, itemScore2, itemScore3, itemScore4, itemScore5)
+        return if (scores.isNotEmpty()) scores.average().toFloat() else 0f
+    }
 }
 
 class ReviewViewModelFactory(

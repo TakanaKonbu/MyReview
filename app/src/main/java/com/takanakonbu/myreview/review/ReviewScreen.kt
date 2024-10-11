@@ -1,12 +1,13 @@
 package com.takanakonbu.myreview.review
 
+import ReviewViewModel
+import ReviewViewModelFactory
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +24,7 @@ import com.takanakonbu.myreview.review.data.ReviewRepository
 import java.text.SimpleDateFormat
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewScreen(
     categoryId: Int,
@@ -37,6 +39,11 @@ fun ReviewScreen(
     )
 ) {
     val reviews by viewModel.reviews.collectAsState()
+    var showSortDialog by remember { mutableStateOf(false) }
+    var showSearchDialog by remember { mutableStateOf(false) }
+    val sortOrder by viewModel.sortOrder.collectAsState()
+    val showOnlyFavorites by viewModel.showOnlyFavorites.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
 
     LaunchedEffect(categoryId) {
         viewModel.loadReviewsForCategory(categoryId)
@@ -46,12 +53,30 @@ fun ReviewScreen(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate("add_review") },
-                containerColor = Color(0xFF6D6DF6),
-                contentColor = Color.White
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Review")
+            Column {
+                FloatingActionButton(
+                    onClick = { showSearchDialog = true },
+                    containerColor = Color(0xFF6D6DF6),
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Default.Search, contentDescription = "検索")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                FloatingActionButton(
+                    onClick = { showSortDialog = true },
+                    containerColor = Color(0xFF6D6DF6),
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Filled.Sort, contentDescription = "並び替え")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                FloatingActionButton(
+                    onClick = { navController.navigate("add_review/$categoryId") },
+                    containerColor = Color(0xFF6D6DF6),
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = "レビュー追加")
+                }
             }
         }
     ) { innerPadding ->
@@ -84,6 +109,107 @@ fun ReviewScreen(
             }
         }
     }
+
+    if (showSortDialog) {
+        AlertDialog(
+            onDismissRequest = { showSortDialog = false },
+            title = { Text("レビューの並び替え") },
+            text = {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = sortOrder == SortOrder.NEWEST_FIRST,
+                            onClick = {
+                                viewModel.setSortOrder(SortOrder.NEWEST_FIRST)
+                                showSortDialog = false
+                            }
+                        )
+                        Text("新しい順")
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = sortOrder == SortOrder.OLDEST_FIRST,
+                            onClick = {
+                                viewModel.setSortOrder(SortOrder.OLDEST_FIRST)
+                                showSortDialog = false
+                            }
+                        )
+                        Text("古い順")
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = sortOrder == SortOrder.HIGHEST_RATED,
+                            onClick = {
+                                viewModel.setSortOrder(SortOrder.HIGHEST_RATED)
+                                showSortDialog = false
+                            }
+                        )
+                        Text("評価の高い順")
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = sortOrder == SortOrder.LOWEST_RATED,
+                            onClick = {
+                                viewModel.setSortOrder(SortOrder.LOWEST_RATED)
+                                showSortDialog = false
+                            }
+                        )
+                        Text("評価の低い順")
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = showOnlyFavorites,
+                            onCheckedChange = {
+                                viewModel.setShowOnlyFavorites(it)
+                                showSortDialog = false
+                            }
+                        )
+                        Text("お気に入りのみ表示")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showSortDialog = false }) {
+                    Text("閉じる")
+                }
+            }
+        )
+    }
+
+    if (showSearchDialog) {
+        AlertDialog(
+            onDismissRequest = { showSearchDialog = false },
+            title = { Text("レビュー検索") },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        label = { Text("レビュー名") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.searchReviewsInCategory(categoryId, searchQuery)
+                        showSearchDialog = false
+                    }
+                ) {
+                    Text("検索")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showSearchDialog = false }
+                ) {
+                    Text("キャンセル")
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -111,7 +237,7 @@ fun ReviewItem(review: Review, onClick: () -> Unit) {
                 if (review.favorite) {
                     Icon(
                         Icons.Filled.Favorite,
-                        contentDescription = "Favorite",
+                        contentDescription = "お気に入り",
                         tint = Color.Red,
                         modifier = Modifier.size(24.dp)
                     )
@@ -119,7 +245,6 @@ fun ReviewItem(review: Review, onClick: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Calculate average score
             val averageScore = listOfNotNull(
                 review.itemScore1,
                 review.itemScore2,
