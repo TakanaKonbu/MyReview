@@ -60,6 +60,8 @@ fun MyReviewApp() {
                 "レビュー追加"
             currentScreen.startsWith("edit_review") ->
                 "レビュー編集"
+            currentScreen == "settings" ->
+                "設定"
             else -> "My Review"
         }
     }
@@ -74,7 +76,7 @@ fun MyReviewApp() {
                 showBackButton = showBackButton,
                 onBackClick = { navController.popBackStack() },
                 actions = {
-                    IconButton(onClick = { /* 設定画面に遷移するロジックをここに追加 */ }) {
+                    IconButton(onClick = { navController.navigate("settings") }) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = "Settings",
@@ -184,6 +186,10 @@ fun MyReviewApp() {
                     onNavigateBack = { navController.popBackStack() },
                     reviewId = reviewId
                 )
+            }
+            // 設定画面用の新しいルートを追加
+            composable("settings") {
+                SettingsScreen(onNavigateBack = { navController.popBackStack() })
             }
         }
     }
