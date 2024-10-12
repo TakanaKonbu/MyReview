@@ -20,4 +20,7 @@ class CategoryRepository(private val categoryDao: CategoryDao) {
     suspend fun getCategoryById(id: Int): Category? {
         return categoryDao.getCategoryById(id)
     }
+    suspend fun deleteAllCategories() {
+        categoryDao.deleteAllCategories()
+    }
 }

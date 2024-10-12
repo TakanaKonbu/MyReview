@@ -48,4 +48,8 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
     suspend fun searchReviewsInCategory(categoryId: Int, query: String): List<Review> {
         return reviewDao.searchReviewsInCategory(categoryId, query)
     }
+
+    suspend fun deleteAllReviews() {
+        reviewDao.deleteAllReviews()
+    }
 }

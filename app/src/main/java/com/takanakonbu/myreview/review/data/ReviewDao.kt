@@ -48,4 +48,7 @@ interface ReviewDao {
     // 特定のカテゴリー内でレビュー名を検索
     @Query("SELECT * FROM reviews WHERE categoryId = :categoryId AND name LIKE '%' || :query || '%'")
     suspend fun searchReviewsInCategory(categoryId: Int, query: String): List<Review>
+    @Query("DELETE FROM reviews")
+    suspend fun deleteAllReviews()
+
 }

@@ -24,4 +24,7 @@ interface CategoryDao {
     // ID指定で単一カテゴリー取得（必要に応じて）
     @Query("SELECT * FROM categories WHERE id = :categoryId")
     suspend fun getCategoryById(categoryId: Int): Category?
+
+    @Query("DELETE FROM categories")
+    suspend fun deleteAllCategories()
 }

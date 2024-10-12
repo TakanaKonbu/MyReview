@@ -22,19 +22,29 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.takanakonbu.myreview.category.CategoryList
 import com.takanakonbu.myreview.category.EditCategoryScreen
+import com.takanakonbu.myreview.category.data.AppDatabase
+import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.AddReviewScreen as ReviewAddScreen
 import com.takanakonbu.myreview.category.AddReviewScreen as CategoryAddScreen
 import com.takanakonbu.myreview.review.ReviewScreen
 import com.takanakonbu.myreview.review.ReviewDetailScreen
+import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.ui.theme.MyReviewTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var categoryRepository: CategoryRepository
+    private lateinit var reviewRepository: ReviewRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // データベースとリポジトリの初期化
+        val database = AppDatabase.getDatabase(applicationContext)
+        categoryRepository = CategoryRepository(database.categoryDao())
+        reviewRepository = ReviewRepository(database.reviewDao())
         setContent {
             MyReviewTheme(darkTheme = false) {
-                MyReviewApp()
+                MyReviewApp(categoryRepository, reviewRepository)
             }
         }
     }
@@ -42,7 +52,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyReviewApp() {
+fun MyReviewApp(categoryRepository: CategoryRepository, reviewRepository: ReviewRepository) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
@@ -94,10 +104,6 @@ fun MyReviewApp() {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // カテゴリー一覧画面
-            // - "add_category"へ遷移：新規カテゴリー追加
-            // - "edit_category/{categoryId}"へ遷移：既存カテゴリーの編集
-            // - "review_list/{categoryId}/{categoryName}"へ遷移：特定カテゴリーのレビュー一覧表示
             composable("category_list") {
                 CategoryList(
                     onAddCategory = { navController.navigate("add_category") },
@@ -110,16 +116,12 @@ fun MyReviewApp() {
                 )
             }
 
-            // 新規カテゴリー追加画面
-            // - 前の画面（通常はカテゴリー一覧）に戻る
             composable("add_category") {
                 CategoryAddScreen(
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
 
-            // カテゴリー編集画面
-            // - 前の画面（通常はカテゴリー一覧）に戻る
             composable(
                 "edit_category/{categoryId}",
                 arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
@@ -131,10 +133,6 @@ fun MyReviewApp() {
                 )
             }
 
-            // レビュー一覧画面（特定のカテゴリーに属するレビュー）
-            // - "review_detail/{reviewId}"へ遷移：レビューの詳細表示
-            // - "add_review"へ遷移：新規レビュー追加
-            // - 前の画面（通常はカテゴリー一覧）に戻る
             composable(
                 "review_list/{categoryId}/{categoryName}",
                 arguments = listOf(
@@ -152,9 +150,6 @@ fun MyReviewApp() {
                 )
             }
 
-            // レビュー詳細画面
-            // - "edit_review/{reviewId}"へ遷移：レビューの編集
-            // - 前の画面（通常はレビュー一覧）に戻る
             composable(
                 "review_detail/{reviewId}",
                 arguments = listOf(navArgument("reviewId") { type = NavType.IntType })
@@ -167,16 +162,12 @@ fun MyReviewApp() {
                 )
             }
 
-            // 新規レビュー追加画面
-            // - 前の画面（通常はレビュー一覧）に戻る
             composable("add_review") {
                 ReviewAddScreen(
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
 
-            // レビュー編集画面
-            // - 前の画面（通常はレビュー詳細）に戻る
             composable(
                 "edit_review/{reviewId}",
                 arguments = listOf(navArgument("reviewId") { type = NavType.IntType })
@@ -187,9 +178,13 @@ fun MyReviewApp() {
                     reviewId = reviewId
                 )
             }
-            // 設定画面用の新しいルートを追加
+
             composable("settings") {
-                SettingsScreen(onNavigateBack = { navController.popBackStack() })
+                SettingsScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    categoryRepository = categoryRepository,
+                    reviewRepository = reviewRepository
+                )
             }
         }
     }
