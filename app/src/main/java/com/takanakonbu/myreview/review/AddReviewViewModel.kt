@@ -24,42 +24,54 @@ class AddReviewViewModel(
     private val reviewRepository: ReviewRepository
 ) : ViewModel() {
 
+    // カテゴリーのリストを保持するStateFlow
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories.asStateFlow()
 
+    // レビューのタイトルを保持するStateFlow
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title.asStateFlow()
 
+    // お気に入り状態を保持するStateFlow
     private val _isFavorite = MutableStateFlow(false)
     val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
 
+    // 選択されたカテゴリーのIDを保持するStateFlow
     private val _selectedCategoryId = MutableStateFlow<Int?>(null)
     val selectedCategoryId: StateFlow<Int?> = _selectedCategoryId.asStateFlow()
 
+    // 選択されたカテゴリーを保持するStateFlow
     private val _selectedCategory = MutableStateFlow<Category?>(null)
     val selectedCategory: StateFlow<Category?> = _selectedCategory.asStateFlow()
 
+    // ジャンルを保持するStateFlow
     private val _genre = MutableStateFlow("")
     val genre: StateFlow<String> = _genre.asStateFlow()
 
+    // レビュー本文を保持するStateFlow
     private val _review = MutableStateFlow("")
     val review: StateFlow<String> = _review.asStateFlow()
 
+    // 各項目のスコアを保持するStateFlow
     private val _itemScores = MutableStateFlow<Map<String, Float>>(emptyMap())
     val itemScores: StateFlow<Map<String, Float>> = _itemScores.asStateFlow()
 
+    // 画像のURIを保持するStateFlow
     private val _imageUri = MutableStateFlow<String?>(null)
     val imageUri: StateFlow<String?> = _imageUri.asStateFlow()
 
+    // 編集モードかどうかを示すStateFlow
     private val _isEditMode = MutableStateFlow(false)
     val isEditMode: StateFlow<Boolean> = _isEditMode.asStateFlow()
 
+    // 編集中のレビューID
     private var editingReviewId: Int? = null
 
     init {
         loadCategories()
     }
 
+    // カテゴリーを読み込む
     private fun loadCategories() {
         viewModelScope.launch {
             categoryRepository.allCategories.collect { categories ->
@@ -71,14 +83,17 @@ class AddReviewViewModel(
         }
     }
 
+    // タイトルを設定する
     fun setTitle(title: String) {
         _title.value = title
     }
 
+    // お気に入り状態を切り替える
     fun toggleFavorite() {
         _isFavorite.value = !_isFavorite.value
     }
 
+    // 選択されたカテゴリーIDを設定し、関連する情報を更新する
     fun setSelectedCategoryId(id: Int) {
         _selectedCategoryId.value = id
         viewModelScope.launch {
@@ -87,22 +102,27 @@ class AddReviewViewModel(
         }
     }
 
+    // ジャンルを設定する
     fun setGenre(genre: String) {
         _genre.value = genre
     }
 
+    // レビュー本文を設定する
     fun setReview(review: String) {
         _review.value = review
     }
 
+    // 特定の項目のスコアを設定する
     fun setItemScore(item: String, score: Float) {
         _itemScores.value = _itemScores.value.toMutableMap().apply { this[item] = score }
     }
 
+    // 画像のURIを設定する
     fun setImageUri(uri: String?) {
         _imageUri.value = uri
     }
 
+    // カテゴリーに基づいて項目スコアを更新する
     private fun updateItemScores(category: Category) {
         _itemScores.value = listOfNotNull(
             category.item1 to 3f,
@@ -113,6 +133,7 @@ class AddReviewViewModel(
         ).toMap()
     }
 
+    // 編集のためにレビューを読み込む
     fun loadReviewForEditing(reviewId: Int) {
         viewModelScope.launch {
             val review = reviewRepository.getReviewById(reviewId)
@@ -126,13 +147,14 @@ class AddReviewViewModel(
                 _review.value = it.review
                 _imageUri.value = it.image
 
-                // Load category and update item scores
+                // カテゴリーを読み込み、項目スコアを更新する
                 _selectedCategory.value = categoryRepository.getCategoryById(it.categoryId)
                 updateItemScores(_selectedCategory.value ?: return@launch, review)
             }
         }
     }
 
+    // レビューに基づいて項目スコアを更新する
     private fun updateItemScores(category: Category, review: Review) {
         _itemScores.value = buildMap {
             put(category.item1, review.itemScore1.toFloat())
@@ -143,6 +165,7 @@ class AddReviewViewModel(
         }
     }
 
+    // 画像を内部ストレージに保存する
     private suspend fun saveImageToInternalStorage(uri: Uri): String? {
         return withContext(Dispatchers.IO) {
             try {
@@ -162,6 +185,7 @@ class AddReviewViewModel(
         }
     }
 
+    // レビューを保存または更新する
     fun saveReview() {
         viewModelScope.launch {
             val imagePath = imageUri.value?.let { uri ->
@@ -194,6 +218,7 @@ class AddReviewViewModel(
     }
 }
 
+// AddReviewViewModelのファクトリークラス
 class AddReviewViewModelFactory(
     private val context: Context,
     private val categoryRepository: CategoryRepository,

@@ -12,18 +12,18 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Date
 
+// カテゴリー関連の操作を管理するViewModel
 class CategoryViewModel(private val repository: CategoryRepository) : ViewModel() {
 
-    // すべてのカテゴリーを取得
+    // すべてのカテゴリーを取得し、StateFlowとして公開
     val allCategories: StateFlow<List<Category>> = repository.allCategories
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    // 新しいカテゴリーの入力状態を管理
+    // 新しいカテゴリーの名前入力状態を管理
     private val _newCategoryName = MutableStateFlow("")
     val newCategoryName: StateFlow<String> = _newCategoryName.asStateFlow()
 
-
-
+    // 新しいカテゴリーの項目入力状態を管理（5項目）
     private val _newCategoryItems = MutableStateFlow(List(5) { "" })
     val newCategoryItems: StateFlow<List<String>> = _newCategoryItems.asStateFlow()
 
@@ -32,6 +32,7 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
         val name = _newCategoryName.value
         val items = _newCategoryItems.value
 
+        // 名前が空白でなく、少なくとも1つの項目が入力されている場合のみ追加
         if (name.isNotBlank() && items.any { it.isNotBlank() }) {
             val newCategory = Category(
                 name = name,
@@ -60,13 +61,12 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
         repository.deleteCategory(category)
     }
 
-    // 入力フィールドの値を更新
+    // 新しいカテゴリー名の入力値を更新
     fun updateNewCategoryName(name: String) {
         _newCategoryName.value = name
     }
 
-
-
+    // 新しいカテゴリーの項目入力値を更新
     fun updateNewCategoryItem(index: Int, value: String) {
         _newCategoryItems.value = _newCategoryItems.value.toMutableList().apply {
             this[index] = value
@@ -79,11 +79,13 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
         _newCategoryItems.value = List(5) { "" }
     }
 
+    // IDでカテゴリーを取得
     suspend fun getCategoryById(id: Int): Category? {
         return repository.getCategoryById(id)
     }
 }
 
+// CategoryViewModelのファクトリークラス
 class CategoryViewModelFactory(private val repository: CategoryRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CategoryViewModel::class.java)) {
