@@ -95,7 +95,10 @@ fun SettingsScreen(
             )
         }
         if (backupCompleted) {
-            Text("バックアップが完了しました。")
+            Text(
+                "バックアップが完了しました。",
+                modifier = Modifier.padding(8.dp)
+            )
         }
         HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
 
