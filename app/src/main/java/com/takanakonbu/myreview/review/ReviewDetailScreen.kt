@@ -111,8 +111,8 @@ fun ReviewDetailScreen(
                             contentDescription = "Review Image",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(200.dp),
-                            contentScale = ContentScale.Crop
+                                .aspectRatio(1f), // This ensures the image is displayed in a 1:1 aspect ratio
+                            contentScale = ContentScale.Fit // This ensures the entire image is visible
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
