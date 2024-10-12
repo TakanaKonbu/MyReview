@@ -31,6 +31,7 @@ import kotlin.math.roundToInt
 @Composable
 fun AddReviewScreen(
     onNavigateBack: () -> Unit,
+    categoryId: Int? = null,
     reviewId: Int? = null
 ) {
     val context = LocalContext.current

@@ -202,7 +202,7 @@ fun ReviewDetailScreen(
                                 showDeleteDialog = false
                                 onNavigateBack()
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778))
                         ) {
                             Text("削除")
                         }

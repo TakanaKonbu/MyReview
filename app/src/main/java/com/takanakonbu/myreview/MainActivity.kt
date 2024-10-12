@@ -24,7 +24,7 @@ import com.takanakonbu.myreview.category.CategoryList
 import com.takanakonbu.myreview.category.EditCategoryScreen
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
-import com.takanakonbu.myreview.review.AddReviewScreen as ReviewAddScreen
+import com.takanakonbu.myreview.review.AddReviewScreen
 import com.takanakonbu.myreview.category.AddReviewScreen as CategoryAddScreen
 import com.takanakonbu.myreview.review.ReviewScreen
 import com.takanakonbu.myreview.review.ReviewDetailScreen
@@ -162,8 +162,13 @@ fun MyReviewApp(categoryRepository: CategoryRepository, reviewRepository: Review
                 )
             }
 
-            composable("add_review") {
-                ReviewAddScreen(
+            composable(
+                "add_review/{categoryId}",
+                arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
+                AddReviewScreen(
+                    categoryId = categoryId,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
@@ -173,9 +178,9 @@ fun MyReviewApp(categoryRepository: CategoryRepository, reviewRepository: Review
                 arguments = listOf(navArgument("reviewId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val reviewId = backStackEntry.arguments?.getInt("reviewId") ?: return@composable
-                ReviewAddScreen(
-                    onNavigateBack = { navController.popBackStack() },
-                    reviewId = reviewId
+                AddReviewScreen(
+                    reviewId = reviewId,
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
 

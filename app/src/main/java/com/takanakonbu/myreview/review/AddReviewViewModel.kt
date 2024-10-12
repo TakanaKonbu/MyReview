@@ -71,6 +71,19 @@ class AddReviewViewModel(
         loadCategories()
     }
 
+    fun prepareNewReview(categoryId: Int) {
+        viewModelScope.launch {
+            _isEditMode.value = false
+            editingReviewId = null
+            setSelectedCategoryId(categoryId)
+            _title.value = ""
+            _isFavorite.value = false
+            _genre.value = ""
+            _review.value = ""
+            _imageUri.value = null
+        }
+    }
+
     // カテゴリーを読み込む
     private fun loadCategories() {
         viewModelScope.launch {
