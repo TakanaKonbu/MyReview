@@ -163,12 +163,17 @@ fun MyReviewApp(categoryRepository: CategoryRepository, reviewRepository: Review
             }
 
             composable(
-                "add_review/{categoryId}",
-                arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+                "add_review/{categoryId}/{categoryName}",
+                arguments = listOf(
+                    navArgument("categoryId") { type = NavType.IntType },
+                    navArgument("categoryName") { type = NavType.StringType }
+                )
             ) { backStackEntry ->
                 val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
+                val categoryName = backStackEntry.arguments?.getString("categoryName") ?: return@composable
                 AddReviewScreen(
                     categoryId = categoryId,
+                    categoryName = categoryName,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

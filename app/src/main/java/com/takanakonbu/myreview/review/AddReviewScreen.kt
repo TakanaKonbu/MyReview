@@ -32,6 +32,7 @@ import kotlin.math.roundToInt
 fun AddReviewScreen(
     onNavigateBack: () -> Unit,
     categoryId: Int? = null,
+    categoryName: String? = null,
     reviewId: Int? = null
 ) {
     val context = LocalContext.current
@@ -62,8 +63,11 @@ fun AddReviewScreen(
         uri?.let { viewModel.setImageUri(it.toString()) }
     }
 
-    LaunchedEffect(reviewId) {
+    LaunchedEffect(reviewId, categoryId, categoryName) {
         reviewId?.let { viewModel.loadReviewForEditing(it) }
+        if (reviewId == null && categoryId != null && categoryName != null) {
+            viewModel.setSelectedCategoryId(categoryId)
+        }
     }
 
     Scaffold(
@@ -125,7 +129,7 @@ fun AddReviewScreen(
                 onExpandedChange = { expanded = !expanded }
             ) {
                 TextField(
-                    value = selectedCategory?.name ?: "",
+                    value = selectedCategory?.name ?: categoryName ?: "",
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("カテゴリー") },

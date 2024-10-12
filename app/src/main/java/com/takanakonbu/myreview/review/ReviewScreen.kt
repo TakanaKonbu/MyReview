@@ -2,6 +2,7 @@ package com.takanakonbu.myreview.review
 
 import ReviewViewModel
 import ReviewViewModelFactory
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -71,7 +72,9 @@ fun ReviewScreen(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 FloatingActionButton(
-                    onClick = { navController.navigate("add_review/$categoryId") },
+                    onClick = {
+                        navController.navigate("add_review/$categoryId/${Uri.encode(categoryName)}")
+                    },
                     containerColor = Color(0xFF6D6DF6),
                     contentColor = Color.White
                 ) {
