@@ -51,4 +51,7 @@ interface ReviewDao {
     @Query("DELETE FROM reviews")
     suspend fun deleteAllReviews()
 
+    @Query("SELECT COUNT(*) FROM reviews WHERE categoryId = :categoryId")
+    suspend fun getReviewCountForCategory(categoryId: Int): Int
+
 }

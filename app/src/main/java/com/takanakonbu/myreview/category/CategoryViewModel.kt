@@ -1,22 +1,29 @@
 package com.takanakonbu.myreview.category.ui
 
 import androidx.lifecycle.*
-import androidx.lifecycle.asLiveData
 import com.takanakonbu.myreview.category.data.Category
 import com.takanakonbu.myreview.category.data.CategoryRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
+import com.takanakonbu.myreview.review.data.ReviewRepository
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.Date
 
 // カテゴリー関連の操作を管理するViewModel
-class CategoryViewModel(private val repository: CategoryRepository) : ViewModel() {
+class CategoryViewModel(
+    private val categoryRepository: CategoryRepository,
+    private val reviewRepository: ReviewRepository
+) : ViewModel() {
 
-    // すべてのカテゴリーを取得し、StateFlowとして公開
-    val allCategories: StateFlow<List<Category>> = repository.allCategories
+    // すべてのカテゴリーとそのレビュー数を取得し、StateFlowとして公開
+    val allCategoriesWithReviewCount: StateFlow<List<CategoryWithReviewCount>> = categoryRepository.allCategories
+        .map { categories ->
+            categories.map { category ->
+                CategoryWithReviewCount(
+                    category = category,
+                    reviewCount = reviewRepository.getReviewCountForCategory(category.id)
+                )
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     // 新しいカテゴリーの名前入力状態を管理
@@ -44,7 +51,7 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
                 createdDate = Date()
             )
             viewModelScope.launch {
-                repository.insertCategory(newCategory)
+                categoryRepository.insertCategory(newCategory)
             }
             // 入力フィールドをクリア
             clearInputs()
@@ -53,12 +60,12 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
 
     // カテゴリーを更新
     fun updateCategory(category: Category) = viewModelScope.launch {
-        repository.updateCategory(category)
+        categoryRepository.updateCategory(category)
     }
 
     // カテゴリーを削除
     fun deleteCategory(category: Category) = viewModelScope.launch {
-        repository.deleteCategory(category)
+        categoryRepository.deleteCategory(category)
     }
 
     // 新しいカテゴリー名の入力値を更新
@@ -81,16 +88,25 @@ class CategoryViewModel(private val repository: CategoryRepository) : ViewModel(
 
     // IDでカテゴリーを取得
     suspend fun getCategoryById(id: Int): Category? {
-        return repository.getCategoryById(id)
+        return categoryRepository.getCategoryById(id)
     }
 }
 
+// カテゴリーとそのレビュー数を組み合わせたデータクラス
+data class CategoryWithReviewCount(
+    val category: Category,
+    val reviewCount: Int
+)
+
 // CategoryViewModelのファクトリークラス
-class CategoryViewModelFactory(private val repository: CategoryRepository) : ViewModelProvider.Factory {
+class CategoryViewModelFactory(
+    private val categoryRepository: CategoryRepository,
+    private val reviewRepository: ReviewRepository
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CategoryViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return CategoryViewModel(repository) as T
+            return CategoryViewModel(categoryRepository, reviewRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

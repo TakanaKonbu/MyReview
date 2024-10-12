@@ -21,10 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.takanakonbu.myreview.category.data.AppDatabase
-import com.takanakonbu.myreview.category.data.Category
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.category.ui.CategoryViewModel
 import com.takanakonbu.myreview.category.ui.CategoryViewModelFactory
+import com.takanakonbu.myreview.category.ui.CategoryWithReviewCount
+import com.takanakonbu.myreview.review.data.ReviewRepository
 
 @Composable
 fun CategoryList(
@@ -33,24 +34,23 @@ fun CategoryList(
     onCategorySelected: (Int, String) -> Unit,
     viewModel: CategoryViewModel = viewModel(
         factory = CategoryViewModelFactory(
-            CategoryRepository(
-                AppDatabase.getDatabase(LocalContext.current).categoryDao()
-            )
+            CategoryRepository(AppDatabase.getDatabase(LocalContext.current).categoryDao()),
+            ReviewRepository(AppDatabase.getDatabase(LocalContext.current).reviewDao())
         )
     )
 ) {
-    val categories by viewModel.allCategories.collectAsState(initial = emptyList())
+    val categoriesWithReviewCount by viewModel.allCategoriesWithReviewCount.collectAsState(initial = emptyList())
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp)
         ) {
-            items(categories) { category ->
+            items(categoriesWithReviewCount) { categoryWithCount ->
                 CategoryItem(
-                    category = category,
-                    onEditCategory = { onEditCategory(category.id) },
-                    onCategorySelected = { onCategorySelected(category.id, category.name) }
+                    categoryWithCount = categoryWithCount,
+                    onEditCategory = { onEditCategory(categoryWithCount.category.id) },
+                    onCategorySelected = { onCategorySelected(categoryWithCount.category.id, categoryWithCount.category.name) }
                 )
             }
         }
@@ -62,14 +62,14 @@ fun CategoryList(
                 .padding(16.dp),
             containerColor = Color(0xFF6D6DF6)
         ) {
-            Icon(Icons.Filled.Add, contentDescription = "Add Category", tint = Color.White)
+            Icon(Icons.Filled.Add, contentDescription = "カテゴリーを追加", tint = Color.White)
         }
     }
 }
 
 @Composable
 fun CategoryItem(
-    category: Category,
+    categoryWithCount: CategoryWithReviewCount,
     onEditCategory: () -> Unit,
     onCategorySelected: () -> Unit
 ) {
@@ -84,19 +84,23 @@ fun CategoryItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = category.name,
+                text = categoryWithCount.category.name,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f)
             )
+            Text(
+                text = "(${categoryWithCount.reviewCount})",
+                fontSize = 18.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(end = 8.dp)
+            )
             IconButton(onClick = onEditCategory) {
-                Icon(Icons.Filled.Edit, contentDescription = "Edit Category")
+                Icon(Icons.Filled.Edit, contentDescription = "カテゴリーを編集")
             }
         }
-
-
+        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
     }
-    HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
 }
 
 @Preview(showBackground = true)

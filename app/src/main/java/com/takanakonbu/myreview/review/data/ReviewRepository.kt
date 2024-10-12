@@ -52,4 +52,8 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
     suspend fun deleteAllReviews() {
         reviewDao.deleteAllReviews()
     }
+
+    suspend fun getReviewCountForCategory(categoryId: Int): Int {
+        return reviewDao.getReviewCountForCategory(categoryId)
+    }
 }

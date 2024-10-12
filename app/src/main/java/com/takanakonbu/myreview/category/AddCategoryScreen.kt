@@ -21,15 +21,15 @@ import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.category.ui.CategoryViewModel
 import com.takanakonbu.myreview.category.ui.CategoryViewModelFactory
+import com.takanakonbu.myreview.review.data.ReviewRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddReviewScreen(
     viewModel: CategoryViewModel = viewModel(
         factory = CategoryViewModelFactory(
-            CategoryRepository(
-                AppDatabase.getDatabase(LocalContext.current).categoryDao()
-            )
+            CategoryRepository(AppDatabase.getDatabase(LocalContext.current).categoryDao()),
+            ReviewRepository(AppDatabase.getDatabase(LocalContext.current).reviewDao())
         )
     ),
     onNavigateBack: () -> Unit
