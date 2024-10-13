@@ -1,5 +1,6 @@
 package com.takanakonbu.myreview.category
 
+import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,16 +28,25 @@ import com.takanakonbu.myreview.review.data.ReviewRepository
 fun CategoryList(
     onAddCategory: () -> Unit,
     onEditCategory: (Int) -> Unit,
-    onCategorySelected: (Int, String) -> Unit,
-    viewModel: CategoryViewModel = viewModel(
+    onCategorySelected: (Int, String) -> Unit
+) {
+    val context = LocalContext.current
+    val viewModel: CategoryViewModel = viewModel(
         factory = CategoryViewModelFactory(
-            CategoryRepository(AppDatabase.getDatabase(LocalContext.current).categoryDao()),
-            ReviewRepository(AppDatabase.getDatabase(LocalContext.current).reviewDao())
+            CategoryRepository(AppDatabase.getDatabase(context).categoryDao()),
+            ReviewRepository(AppDatabase.getDatabase(context).reviewDao()),
+            context
         )
     )
-) {
+
     val categoriesWithReviewCount by viewModel.allCategoriesWithReviewCount.collectAsState(initial = emptyList())
+    val maxCategories by viewModel.maxCategories.collectAsState()
     var showAdDialog by remember { mutableStateOf(false) }
+    var showRewardEarnedDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadRewardedAd()
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -54,7 +64,7 @@ fun CategoryList(
 
         FloatingActionButton(
             onClick = {
-                if (categoriesWithReviewCount.size >= 3) {
+                if (categoriesWithReviewCount.size >= maxCategories) {
                     showAdDialog = true
                 } else {
                     onAddCategory()
@@ -77,8 +87,18 @@ fun CategoryList(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        // 広告視聴の処理をここに追加（今回は何もしない）
-                        showAdDialog = false
+                        val activity = context as? Activity
+                        activity?.let {
+                            viewModel.showRewardedAd(
+                                activity = it,
+                                onRewardEarned = {
+                                    showRewardEarnedDialog = true
+                                },
+                                onAdDismissed = {
+                                    showAdDialog = false
+                                }
+                            )
+                        }
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFD27778))
                 ) {
@@ -91,6 +111,33 @@ fun CategoryList(
                     colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF6D6DF6))
                 ) {
                     Text("キャンセル")
+                }
+            }
+        )
+    }
+
+    if (showRewardEarnedDialog) {
+        AlertDialog(
+            onDismissRequest = { showRewardEarnedDialog = false },
+            title = { Text("カテゴリー枠が増加しました") },
+            text = { Text("カテゴリー枠が1つ増加しました。新しいカテゴリーを追加できます。") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showRewardEarnedDialog = false
+                        onAddCategory()
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF6D6DF6))
+                ) {
+                    Text("カテゴリーを追加")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showRewardEarnedDialog = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF6D6DF6))
+                ) {
+                    Text("閉じる")
                 }
             }
         )

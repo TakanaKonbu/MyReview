@@ -1,6 +1,13 @@
 package com.takanakonbu.myreview.category.ui
 
+import android.app.Activity
+import android.content.Context
 import androidx.lifecycle.*
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.android.gms.ads.FullScreenContentCallback
 import com.takanakonbu.myreview.category.data.Category
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.ReviewRepository
@@ -10,13 +17,16 @@ import java.util.Date
 
 class CategoryViewModel(
     private val categoryRepository: CategoryRepository,
-    private val reviewRepository: ReviewRepository
+    private val reviewRepository: ReviewRepository,
+    private val context: Context
 ) : ViewModel() {
 
-    // カテゴリーの最大数を3に制限
-    private val maxCategories = 3
+    private var _maxCategories = MutableStateFlow(3)
+    val maxCategories: StateFlow<Int> = _maxCategories.asStateFlow()
 
-    // すべてのカテゴリーとそのレビュー数を取得し、StateFlowとして公開
+    private var rewardedAd: RewardedAd? = null
+    private val adUnitId = "ca-app-pub-2836653067032260/7608512459"
+
     val allCategoriesWithReviewCount: StateFlow<List<CategoryWithReviewCount>> = categoryRepository.allCategories
         .map { categories ->
             categories.map { category ->
@@ -28,22 +38,19 @@ class CategoryViewModel(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    // 新しいカテゴリーの名前入力状態を管理
     private val _newCategoryName = MutableStateFlow("")
     val newCategoryName: StateFlow<String> = _newCategoryName.asStateFlow()
 
-    // 新しいカテゴリーの項目入力状態を管理（5項目）
     private val _newCategoryItems = MutableStateFlow(List(5) { "" })
     val newCategoryItems: StateFlow<List<String>> = _newCategoryItems.asStateFlow()
 
-    // カテゴリーを追加
     fun insertCategory() {
         val name = _newCategoryName.value
         val items = _newCategoryItems.value
 
         viewModelScope.launch {
             val currentCategoryCount = allCategoriesWithReviewCount.value.size
-            if (currentCategoryCount < maxCategories && name.isNotBlank() && items.any { it.isNotBlank() }) {
+            if (currentCategoryCount < _maxCategories.value && name.isNotBlank() && items.any { it.isNotBlank() }) {
                 val newCategory = Category(
                     name = name,
                     item1 = items[0],
@@ -59,55 +66,80 @@ class CategoryViewModel(
         }
     }
 
-    // カテゴリーを更新
     fun updateCategory(category: Category) = viewModelScope.launch {
         categoryRepository.updateCategory(category)
     }
 
-    // カテゴリーを削除
     fun deleteCategory(category: Category) = viewModelScope.launch {
         categoryRepository.deleteCategory(category)
     }
 
-    // 新しいカテゴリー名の入力値を更新
     fun updateNewCategoryName(name: String) {
         _newCategoryName.value = name
     }
 
-    // 新しいカテゴリーの項目入力値を更新
     fun updateNewCategoryItem(index: Int, value: String) {
         _newCategoryItems.value = _newCategoryItems.value.toMutableList().apply {
             this[index] = value
         }
     }
 
-    // 入力フィールドをクリア
     private fun clearInputs() {
         _newCategoryName.value = ""
         _newCategoryItems.value = List(5) { "" }
     }
 
-    // IDでカテゴリーを取得
     suspend fun getCategoryById(id: Int): Category? {
         return categoryRepository.getCategoryById(id)
     }
+
+    fun loadRewardedAd() {
+        val adRequest = AdRequest.Builder().build()
+        RewardedAd.load(context, adUnitId, adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                rewardedAd = null
+            }
+
+            override fun onAdLoaded(ad: RewardedAd) {
+                rewardedAd = ad
+            }
+        })
+    }
+
+    fun showRewardedAd(activity: Activity, onRewardEarned: () -> Unit, onAdDismissed: () -> Unit) {
+        rewardedAd?.let { ad ->
+            ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    rewardedAd = null
+                    loadRewardedAd()
+                    onAdDismissed()
+                }
+            }
+            ad.show(activity) { rewardItem ->
+                _maxCategories.value += 1
+                onRewardEarned()
+            }
+        } ?: run {
+            loadRewardedAd()
+            onAdDismissed()
+        }
+    }
 }
 
-// カテゴリーとそのレビュー数を組み合わせたデータクラス
 data class CategoryWithReviewCount(
     val category: Category,
     val reviewCount: Int
 )
 
-// CategoryViewModelのファクトリークラス
 class CategoryViewModelFactory(
     private val categoryRepository: CategoryRepository,
-    private val reviewRepository: ReviewRepository
+    private val reviewRepository: ReviewRepository,
+    private val context: Context
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CategoryViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return CategoryViewModel(categoryRepository, reviewRepository) as T
+            return CategoryViewModel(categoryRepository, reviewRepository, context) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

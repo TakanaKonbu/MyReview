@@ -30,6 +30,7 @@ import com.takanakonbu.myreview.review.ReviewScreen
 import com.takanakonbu.myreview.review.ReviewDetailScreen
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.ui.theme.MyReviewTheme
+import com.google.android.gms.ads.MobileAds
 
 class MainActivity : ComponentActivity() {
     private lateinit var categoryRepository: CategoryRepository
@@ -37,6 +38,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MobileAds.initialize(this)
         enableEdgeToEdge()
         // データベースとリポジトリの初期化
         val database = AppDatabase.getDatabase(applicationContext)

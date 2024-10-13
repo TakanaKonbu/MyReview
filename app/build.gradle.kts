@@ -51,6 +51,7 @@ android {
 }
 
 dependencies {
+    implementation ("com.google.android.gms:play-services-ads:22.0.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("androidx.room:room-runtime:2.6.1")

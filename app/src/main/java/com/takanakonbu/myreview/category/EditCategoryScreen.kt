@@ -20,14 +20,17 @@ import com.takanakonbu.myreview.review.data.ReviewRepository
 @Composable
 fun EditCategoryScreen(
     categoryId: Int,
-    viewModel: CategoryViewModel = viewModel(
-        factory = CategoryViewModelFactory(
-            CategoryRepository(AppDatabase.getDatabase(LocalContext.current).categoryDao()),
-            ReviewRepository(AppDatabase.getDatabase(LocalContext.current).reviewDao())
-        )
-    ),
     onNavigateBack: () -> Unit
 ) {
+    val context = LocalContext.current
+    val viewModel: CategoryViewModel = viewModel(
+        factory = CategoryViewModelFactory(
+            CategoryRepository(AppDatabase.getDatabase(context).categoryDao()),
+            ReviewRepository(AppDatabase.getDatabase(context).reviewDao()),
+            context
+        )
+    )
+
     var category by remember { mutableStateOf<Category?>(null) }
     var name by remember { mutableStateOf("") }
     var items by remember { mutableStateOf(List(5) { "" }) }

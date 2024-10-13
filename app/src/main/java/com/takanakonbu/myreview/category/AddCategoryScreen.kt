@@ -19,14 +19,17 @@ import com.takanakonbu.myreview.review.data.ReviewRepository
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddReviewScreen(
-    viewModel: CategoryViewModel = viewModel(
-        factory = CategoryViewModelFactory(
-            CategoryRepository(AppDatabase.getDatabase(LocalContext.current).categoryDao()),
-            ReviewRepository(AppDatabase.getDatabase(LocalContext.current).reviewDao())
-        )
-    ),
     onNavigateBack: () -> Unit
 ) {
+    val context = LocalContext.current
+    val viewModel: CategoryViewModel = viewModel(
+        factory = CategoryViewModelFactory(
+            CategoryRepository(AppDatabase.getDatabase(context).categoryDao()),
+            ReviewRepository(AppDatabase.getDatabase(context).reviewDao()),
+            context
+        )
+    )
+
     val name by viewModel.newCategoryName.collectAsState()
     val items by viewModel.newCategoryItems.collectAsState()
 

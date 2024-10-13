@@ -12,6 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyReview"
         tools:targetApi="31" >
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2836653067032260~8763911528"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
