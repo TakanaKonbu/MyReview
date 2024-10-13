@@ -8,11 +8,13 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.Date
 
-// カテゴリー関連の操作を管理するViewModel
 class CategoryViewModel(
     private val categoryRepository: CategoryRepository,
     private val reviewRepository: ReviewRepository
 ) : ViewModel() {
+
+    // カテゴリーの最大数を3に制限
+    private val maxCategories = 3
 
     // すべてのカテゴリーとそのレビュー数を取得し、StateFlowとして公開
     val allCategoriesWithReviewCount: StateFlow<List<CategoryWithReviewCount>> = categoryRepository.allCategories
@@ -39,22 +41,21 @@ class CategoryViewModel(
         val name = _newCategoryName.value
         val items = _newCategoryItems.value
 
-        // 名前が空白でなく、少なくとも1つの項目が入力されている場合のみ追加
-        if (name.isNotBlank() && items.any { it.isNotBlank() }) {
-            val newCategory = Category(
-                name = name,
-                item1 = items[0],
-                item2 = items[1].takeIf { it.isNotBlank() },
-                item3 = items[2].takeIf { it.isNotBlank() },
-                item4 = items[3].takeIf { it.isNotBlank() },
-                item5 = items[4].takeIf { it.isNotBlank() },
-                createdDate = Date()
-            )
-            viewModelScope.launch {
+        viewModelScope.launch {
+            val currentCategoryCount = allCategoriesWithReviewCount.value.size
+            if (currentCategoryCount < maxCategories && name.isNotBlank() && items.any { it.isNotBlank() }) {
+                val newCategory = Category(
+                    name = name,
+                    item1 = items[0],
+                    item2 = items[1].takeIf { it.isNotBlank() },
+                    item3 = items[2].takeIf { it.isNotBlank() },
+                    item4 = items[3].takeIf { it.isNotBlank() },
+                    item5 = items[4].takeIf { it.isNotBlank() },
+                    createdDate = Date()
+                )
                 categoryRepository.insertCategory(newCategory)
+                clearInputs()
             }
-            // 入力フィールドをクリア
-            clearInputs()
         }
     }
 

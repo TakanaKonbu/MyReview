@@ -8,14 +8,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,6 +36,7 @@ fun CategoryList(
     )
 ) {
     val categoriesWithReviewCount by viewModel.allCategoriesWithReviewCount.collectAsState(initial = emptyList())
+    var showAdDialog by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -55,7 +53,13 @@ fun CategoryList(
         }
 
         FloatingActionButton(
-            onClick = onAddCategory,
+            onClick = {
+                if (categoriesWithReviewCount.size >= 3) {
+                    showAdDialog = true
+                } else {
+                    onAddCategory()
+                }
+            },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
@@ -63,6 +67,33 @@ fun CategoryList(
         ) {
             Icon(Icons.Filled.Add, contentDescription = "カテゴリーを追加", tint = Color.White)
         }
+    }
+
+    if (showAdDialog) {
+        AlertDialog(
+            onDismissRequest = { showAdDialog = false },
+            title = { Text("カテゴリー枠の追加") },
+            text = { Text("広告を見て1枠増加しますか？") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // 広告視聴の処理をここに追加（今回は何もしない）
+                        showAdDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFD27778))
+                ) {
+                    Text("視聴する")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showAdDialog = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF6D6DF6))
+                ) {
+                    Text("キャンセル")
+                }
+            }
+        )
     }
 }
 
@@ -99,14 +130,4 @@ fun CategoryItem(
         }
         HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CategoryListPreview() {
-    CategoryList(
-        onAddCategory = {},
-        onEditCategory = {},
-        onCategorySelected = { _, _ -> }
-    )
 }

@@ -57,7 +57,8 @@ fun AddReviewScreen(
 
             // 評価項目の追加セクション
             Text(
-                "評価項目の追加(最大5個)\n最低1個は必須(1個のみの例：総合)",
+                "評価項目の追加(最大5個)" +
+                        "\n最低1個は必須(1個のみの例：総合)",
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
