@@ -26,7 +26,7 @@ class ReviewViewModel(
     private val context: Context
 ) : ViewModel() {
 
-    private var _maxReviews = MutableStateFlow(7)
+    private var _maxReviews = MutableStateFlow(5)
     val maxReviews: StateFlow<Int> = _maxReviews.asStateFlow()
 
     private var rewardedAd: RewardedAd? = null
