@@ -1,7 +1,6 @@
 package com.takanakonbu.myreview.review
 
-import ReviewViewModel
-import ReviewViewModelFactory
+import android.app.Activity
 import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,12 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.Review
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import com.takanakonbu.myreview.review.data.ReviewViewModel
+import com.takanakonbu.myreview.review.data.ReviewViewModelFactory
+import com.takanakonbu.myreview.review.data.SortOrder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,17 +34,23 @@ fun ReviewScreen(
     categoryId: Int,
     categoryName: String,
     onNavigateBack: () -> Unit,
-    navController: NavController,
-    viewModel: ReviewViewModel = viewModel(
+    navController: NavController
+) {
+    val context = LocalContext.current
+    val viewModel: ReviewViewModel = viewModel(
         factory = ReviewViewModelFactory(
-            ReviewRepository(AppDatabase.getDatabase(LocalContext.current).reviewDao()),
-            CategoryRepository(AppDatabase.getDatabase(LocalContext.current).categoryDao())
+            ReviewRepository(AppDatabase.getDatabase(context).reviewDao()),
+            CategoryRepository(AppDatabase.getDatabase(context).categoryDao()),
+            context
         )
     )
-) {
+
     val reviews by viewModel.reviews.collectAsState()
+    val maxReviews by viewModel.maxReviews.collectAsState()
     var showSortDialog by remember { mutableStateOf(false) }
     var showSearchDialog by remember { mutableStateOf(false) }
+    var showAdDialog by remember { mutableStateOf(false) }
+    var showRewardEarnedDialog by remember { mutableStateOf(false) }
     val sortOrder by viewModel.sortOrder.collectAsState()
     val showOnlyFavorites by viewModel.showOnlyFavorites.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
@@ -73,7 +82,11 @@ fun ReviewScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 FloatingActionButton(
                     onClick = {
-                        navController.navigate("add_review/$categoryId/${Uri.encode(categoryName)}")
+                        if (reviews.size >= maxReviews) {
+                            showAdDialog = true
+                        } else {
+                            navController.navigate("add_review/$categoryId/${Uri.encode(categoryName)}")
+                        }
                     },
                     containerColor = Color(0xFF6D6DF6),
                     contentColor = Color.White
@@ -209,6 +222,70 @@ fun ReviewScreen(
                     onClick = { showSearchDialog = false }
                 ) {
                     Text("キャンセル")
+                }
+            }
+        )
+    }
+
+    if (showAdDialog) {
+        AlertDialog(
+            onDismissRequest = { showAdDialog = false },
+            title = { Text("レビュー枠の追加") },
+            text = { Text("広告を見て3枠増加しますか？") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val activity = context as? Activity
+                        activity?.let {
+                            viewModel.showRewardedAd(
+                                activity = it,
+                                onRewardEarned = {
+                                    showRewardEarnedDialog = true
+                                },
+                                onAdDismissed = {
+                                    showAdDialog = false
+                                }
+                            )
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFD27778))
+                ) {
+                    Text("視聴する")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showAdDialog = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF6D6DF6))
+                ) {
+                    Text("キャンセル")
+                }
+            }
+        )
+    }
+
+    if (showRewardEarnedDialog) {
+        AlertDialog(
+            onDismissRequest = { showRewardEarnedDialog = false },
+            title = { Text("レビュー枠が増加しました") },
+            text = { Text("レビュー枠が3つ増加しました。新しいレビューを追加できます。") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showRewardEarnedDialog = false
+                        navController.navigate("add_review/$categoryId/${Uri.encode(categoryName)}")
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF6D6DF6))
+                ) {
+                    Text("レビューを追加")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showRewardEarnedDialog = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF6D6DF6))
+                ) {
+                    Text("閉じる")
                 }
             }
         )

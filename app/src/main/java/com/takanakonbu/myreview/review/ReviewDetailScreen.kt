@@ -1,7 +1,5 @@
 package com.takanakonbu.myreview.review
 
-import ReviewViewModel
-import ReviewViewModelFactory
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +20,8 @@ import coil.request.ImageRequest
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import com.takanakonbu.myreview.review.data.ReviewViewModel
+import com.takanakonbu.myreview.review.data.ReviewViewModelFactory
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,14 +31,17 @@ import java.util.*
 fun ReviewDetailScreen(
     reviewId: Int,
     onNavigateBack: () -> Unit,
-    navController: NavController,
-    viewModel: ReviewViewModel = viewModel(
+    navController: NavController
+) {
+    val context = LocalContext.current
+    val viewModel: ReviewViewModel = viewModel(
         factory = ReviewViewModelFactory(
-            ReviewRepository(AppDatabase.getDatabase(LocalContext.current).reviewDao()),
-            CategoryRepository(AppDatabase.getDatabase(LocalContext.current).categoryDao())
+            ReviewRepository(AppDatabase.getDatabase(context).reviewDao()),
+            CategoryRepository(AppDatabase.getDatabase(context).categoryDao()),
+            context
         )
     )
-) {
+
     val review by viewModel.selectedReview.collectAsState()
     val category by viewModel.selectedCategory.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -109,8 +112,8 @@ fun ReviewDetailScreen(
                             contentDescription = "Review Image",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .aspectRatio(1f), // This ensures the image is displayed in a 1:1 aspect ratio
-                            contentScale = ContentScale.Fit // This ensures the entire image is visible
+                                .aspectRatio(1f),
+                            contentScale = ContentScale.Fit
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
