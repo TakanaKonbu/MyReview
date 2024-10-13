@@ -6,18 +6,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.Review
@@ -25,12 +29,13 @@ import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.review.data.ReviewViewModel
 import com.takanakonbu.myreview.review.data.ReviewViewModelFactory
 import com.takanakonbu.myreview.review.data.SortOrder
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReviewScreen(
+fun ReviewListScreen(
     categoryId: Int,
     categoryName: String,
     onNavigateBack: () -> Unit,
@@ -114,7 +119,7 @@ fun ReviewScreen(
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     items(reviews) { review ->
-                        ReviewItem(
+                        ReviewListItem(
                             review = review,
                             onClick = {
                                 navController.navigate("review_detail/${review.id}")
@@ -293,7 +298,7 @@ fun ReviewScreen(
 }
 
 @Composable
-fun ReviewItem(review: Review, onClick: () -> Unit) {
+fun ReviewListItem(review: Review, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -301,51 +306,77 @@ fun ReviewItem(review: Review, onClick: () -> Unit) {
             .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = review.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(1f)
-                )
-                if (review.favorite) {
-                    Icon(
-                        Icons.Filled.Favorite,
-                        contentDescription = "お気に入り",
-                        tint = Color.Red,
-                        modifier = Modifier.size(24.dp)
+            // Thumbnail
+            review.image?.let { imagePath ->
+                val imageFile = File(imagePath)
+                if (imageFile.exists()) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(imageFile)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Review Thumbnail",
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                        contentScale = ContentScale.Crop
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
 
-            val averageScore = listOfNotNull(
-                review.itemScore1,
-                review.itemScore2,
-                review.itemScore3,
-                review.itemScore4,
-                review.itemScore5
-            ).average()
+            Spacer(modifier = Modifier.width(16.dp))
 
-            Text(
-                text = "総評: ${String.format("%.1f", averageScore)}",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color(0xFF6D6DF6)
-            )
+            // Review details
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = review.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (review.favorite) {
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = "お気に入り",
+                            tint = Color.Red,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
 
-            Spacer(modifier = Modifier.height(4.dp))
-            val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-            Text(
-                text = dateFormat.format(review.createdDate),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
+                val averageScore = listOfNotNull(
+                    review.itemScore1,
+                    review.itemScore2,
+                    review.itemScore3,
+                    review.itemScore4,
+                    review.itemScore5
+                ).average()
+
+                Text(
+                    text = "総評: ${String.format("%.1f", averageScore)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF6D6DF6)
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+                val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+                Text(
+                    text = dateFormat.format(review.createdDate),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
         }
     }
 }

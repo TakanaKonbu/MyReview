@@ -26,7 +26,7 @@ import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.AddReviewScreen
 import com.takanakonbu.myreview.category.AddReviewScreen as CategoryAddScreen
-import com.takanakonbu.myreview.review.ReviewScreen
+import com.takanakonbu.myreview.review.ReviewListScreen
 import com.takanakonbu.myreview.review.ReviewDetailScreen
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.ui.theme.MyReviewTheme
@@ -144,7 +144,7 @@ fun MyReviewApp(categoryRepository: CategoryRepository, reviewRepository: Review
             ) { backStackEntry ->
                 val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
                 val categoryName = backStackEntry.arguments?.getString("categoryName") ?: return@composable
-                ReviewScreen(
+                ReviewListScreen(
                     categoryId = categoryId,
                     categoryName = categoryName,
                     onNavigateBack = { navController.popBackStack() },
