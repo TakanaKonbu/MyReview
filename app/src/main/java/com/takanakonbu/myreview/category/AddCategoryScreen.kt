@@ -15,6 +15,7 @@ import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.category.ui.CategoryViewModel
 import com.takanakonbu.myreview.category.ui.CategoryViewModelFactory
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import com.takanakonbu.myreview.ui.theme.MainColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +52,7 @@ fun AddReviewScreen(
                 placeholder = { Text("ジャンルを追加") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF6D6DF6),
+                    focusedBorderColor = MainColor,
                     unfocusedBorderColor = Color.Gray
                 )
             )
@@ -74,7 +75,7 @@ fun AddReviewScreen(
                         .fillMaxWidth()
                         .padding(bottom = 8.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF6D6DF6),
+                        focusedBorderColor = MainColor,
                         unfocusedBorderColor = Color.Gray
                     )
                 )
@@ -89,7 +90,7 @@ fun AddReviewScreen(
                     onNavigateBack()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D6DF6))
+                colors = ButtonDefaults.buttonColors(containerColor = MainColor)
             ) {
                 Text("保存", color = Color.White, fontSize = 20.sp)
             }

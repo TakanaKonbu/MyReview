@@ -31,6 +31,7 @@ import com.takanakonbu.myreview.review.ReviewDetailScreen
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.ui.theme.MyReviewTheme
 import com.google.android.gms.ads.MobileAds
+import com.takanakonbu.myreview.ui.theme.MainColor
 
 class MainActivity : ComponentActivity() {
     private lateinit var categoryRepository: CategoryRepository
@@ -225,7 +226,7 @@ fun TopBar(
         },
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF6D6DF6)
+            containerColor = MainColor
         )
     )
 }

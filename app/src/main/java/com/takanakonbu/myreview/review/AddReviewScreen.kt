@@ -24,6 +24,7 @@ import coil.compose.AsyncImage
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import com.takanakonbu.myreview.ui.theme.MainColor
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,7 +105,7 @@ fun AddReviewScreen(
                 onClick = { launcher.launch("image/*") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6D6DF6)
+                    containerColor = MainColor
                 )
             ) {
                 Text("画像を選択")
@@ -191,7 +192,7 @@ fun AddReviewScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "総評: ${String.format("%.1f", averageScore)}",
-                    color = Color(0xFF6D6DF6),
+                    color = MainColor,
                     fontSize = 32.sp
                 )
 
@@ -211,9 +212,9 @@ fun AddReviewScreen(
                         valueRange = 1f..5f,
                         steps = 8,
                         colors = SliderDefaults.colors(
-                            thumbColor = Color(0xFF6D6DF6),
-                            activeTrackColor = Color(0xFF6D6DF6),
-                            inactiveTrackColor = Color(0xFF6D6DF6).copy(alpha = 0.3f)
+                            thumbColor = MainColor,
+                            activeTrackColor = MainColor,
+                            inactiveTrackColor = MainColor.copy(alpha = 0.3f)
                         )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -229,7 +230,7 @@ fun AddReviewScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6D6DF6)
+                    containerColor = MainColor
                 )
             ) {
                 Text(if (isEditMode) "更新" else "保存")

@@ -23,6 +23,7 @@ import com.takanakonbu.myreview.category.ui.CategoryViewModel
 import com.takanakonbu.myreview.category.ui.CategoryViewModelFactory
 import com.takanakonbu.myreview.category.ui.CategoryWithReviewCount
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import com.takanakonbu.myreview.ui.theme.MainColor
 
 @Composable
 fun CategoryList(
@@ -73,7 +74,7 @@ fun CategoryList(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            containerColor = Color(0xFF6D6DF6)
+            containerColor = MainColor
         ) {
             Icon(Icons.Filled.Add, contentDescription = "カテゴリーを追加", tint = Color.White)
         }
@@ -108,7 +109,7 @@ fun CategoryList(
             dismissButton = {
                 TextButton(
                     onClick = { showAdDialog = false },
-                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF6D6DF6))
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor)
                 ) {
                     Text("キャンセル")
                 }
@@ -127,7 +128,7 @@ fun CategoryList(
                         showRewardEarnedDialog = false
                         onAddCategory()
                     },
-                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF6D6DF6))
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor)
                 ) {
                     Text("カテゴリーを追加")
                 }
@@ -135,7 +136,7 @@ fun CategoryList(
             dismissButton = {
                 TextButton(
                     onClick = { showRewardEarnedDialog = false },
-                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF6D6DF6))
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor)
                 ) {
                     Text("閉じる")
                 }

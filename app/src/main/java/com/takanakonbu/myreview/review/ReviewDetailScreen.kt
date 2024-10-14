@@ -22,6 +22,7 @@ import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.review.data.ReviewViewModel
 import com.takanakonbu.myreview.review.data.ReviewViewModelFactory
+import com.takanakonbu.myreview.ui.theme.MainColor
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -95,7 +96,7 @@ fun ReviewDetailScreen(
                 Text(
                     text = "総評: ${String.format("%.1f", averageScore)}",
                     style = MaterialTheme.typography.titleLarge,
-                    color = Color(0xFF6D6DF6)
+                    color = MainColor
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -173,7 +174,7 @@ fun ReviewDetailScreen(
                 // Edit and Delete buttons
                 Button(
                     onClick = { navController.navigate("edit_review/${reviewData.id}") },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D6DF6)),
+                    colors = ButtonDefaults.buttonColors(containerColor = MainColor),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("編集")
