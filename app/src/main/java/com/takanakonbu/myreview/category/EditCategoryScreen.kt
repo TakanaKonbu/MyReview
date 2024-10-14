@@ -143,21 +143,25 @@ fun EditCategoryScreen(
             title = { Text("カテゴリーの削除") },
             text = { Text("このカテゴリーを削除してもよろしいですか？") },
             confirmButton = {
-                TextButton(
+                Button(
                     onClick = {
                         category?.let {
                             viewModel.deleteCategory(it)
                         }
                         showDeleteConfirmDialog = false
                         onNavigateBack()
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778)),
                 ) {
-                    Text("削除", color = Color(0xFFD27778))
+                    Text("削除", color = Color.White)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirmDialog = false }) {
-                    Text("キャンセル")
+                Button(
+                    onClick = { showDeleteConfirmDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6D6DF6)),
+                ) {
+                    Text("キャンセル", color = Color.White)
                 }
             }
         )

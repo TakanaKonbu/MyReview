@@ -162,7 +162,7 @@ fun CategoryItem(
         ) {
             Text(
                 text = categoryWithCount.category.name,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
             )
             Text(
