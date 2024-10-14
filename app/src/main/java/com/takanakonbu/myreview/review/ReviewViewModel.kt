@@ -87,28 +87,12 @@ class ReviewViewModel(
         _showOnlyFavorites.value = show
     }
 
-    fun searchReviews(query: String) {
-        viewModelScope.launch {
-            _reviews.value = reviewRepository.searchReviews(query).first()
-        }
-    }
-
     fun searchReviewsInCategory(categoryId: Int, query: String) {
         viewModelScope.launch {
             _reviews.value = reviewRepository.searchReviewsInCategory(categoryId, query)
         }
     }
 
-    fun insertReview(review: Review) = viewModelScope.launch {
-        val currentCount = reviewRepository.getReviewCountForCategory(review.categoryId)
-        if (currentCount < _maxReviews.value) {
-            reviewRepository.insertReview(review)
-        }
-    }
-
-    fun updateReview(review: Review) = viewModelScope.launch {
-        reviewRepository.updateReview(review)
-    }
 
     fun deleteReview(review: Review) = viewModelScope.launch {
         reviewRepository.deleteReview(review)
@@ -152,7 +136,7 @@ class ReviewViewModel(
                 }
             }
             ad.show(activity) { rewardItem ->
-                _maxReviews.value += 3
+                _maxReviews.value += 2
                 onRewardEarned()
             }
         } ?: run {

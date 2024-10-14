@@ -236,7 +236,7 @@ fun ReviewListScreen(
         AlertDialog(
             onDismissRequest = { showAdDialog = false },
             title = { Text("レビュー枠の追加") },
-            text = { Text("広告を見て3枠増加しますか？") },
+            text = { Text("広告を見て2枠増加しますか？") },
             confirmButton = {
                 TextButton(
                     onClick = {
