@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -121,7 +122,7 @@ fun ReviewDetailScreen(
                 }
 
                 Text(
-                    text = "ジャンル: ${reviewData.genre ?: "未設定"}",
+                    text = "ジャンル: ${if (reviewData.genre.isNullOrEmpty()) "未設定" else reviewData.genre}",
                     style = MaterialTheme.typography.bodyLarge
                 )
 
@@ -150,10 +151,23 @@ fun ReviewDetailScreen(
                         cat.item5?.let { it to reviewData.itemScore5 }
                     ).forEach { (item, score) ->
                         score?.let {
-                            Text(
-                                text = "$item: $it",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = item,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.weight(1f) // 余ったスペースを割り当てる
+                                )
+                                Text(
+                                    text = "$it",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    textAlign = TextAlign.End
+                                )
+                            }
+                            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
                 }
