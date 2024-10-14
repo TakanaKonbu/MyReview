@@ -94,12 +94,6 @@ fun ReviewDetailScreen(
                     reviewData.itemScore5
                 ).average()
 
-                Text(
-                    text = "総評: ${String.format("%.1f", averageScore)}",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MainColor
-                )
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Display image if available
@@ -126,6 +120,28 @@ fun ReviewDetailScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
+                        text = "総評",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MainColor,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Text(
+                        text = "${String.format("%.1f", averageScore)}",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MainColor,
+                        textAlign = TextAlign.End
+                    )
+                }
+
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
                         text = "ジャンル",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.weight(1f)
@@ -138,7 +154,7 @@ fun ReviewDetailScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
                 Row(
@@ -164,7 +180,7 @@ fun ReviewDetailScreen(
                     text = "評価",
                     style = MaterialTheme.typography.titleLarge,
                 )
-
+                Spacer(modifier = Modifier.height(16.dp))
                 category?.let { cat ->
                     listOfNotNull(
                         cat.item1 to reviewData.itemScore1,
@@ -201,6 +217,7 @@ fun ReviewDetailScreen(
                     text = "レビュー",
                     style = MaterialTheme.typography.titleLarge
                 )
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = reviewData.review,
                     style = MaterialTheme.typography.bodyMedium
