@@ -121,25 +121,48 @@ fun ReviewDetailScreen(
                     }
                 }
 
-                Text(
-                    text = "ジャンル: ${if (reviewData.genre.isNullOrEmpty()) "未設定" else reviewData.genre}",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "ジャンル",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = "${if (reviewData.genre.isNullOrEmpty()) "未設定" else reviewData.genre}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        textAlign = TextAlign.End
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-                Text(
-                    text = "作成日: ${dateFormat.format(reviewData.createdDate)}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "作成日",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = "${dateFormat.format(reviewData.createdDate)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        textAlign = TextAlign.End
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = "評価",
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
 
                 category?.let { cat ->
