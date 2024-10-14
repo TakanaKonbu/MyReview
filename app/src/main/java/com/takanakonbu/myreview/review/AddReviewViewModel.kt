@@ -201,8 +201,20 @@ class AddReviewViewModel(
     // レビューを保存または更新する
     fun saveReview() {
         viewModelScope.launch {
-            val imagePath = imageUri.value?.let { uri ->
-                saveImageToInternalStorage(Uri.parse(uri))
+            val currentReview = if (_isEditMode.value) {
+                editingReviewId?.let { reviewRepository.getReviewById(it) }
+            } else null
+
+            val imagePath = when {
+                imageUri.value?.startsWith("content://") == true -> {
+                    // 新しい画像が選択された場合
+                    saveImageToInternalStorage(Uri.parse(imageUri.value))
+                }
+                imageUri.value != null -> {
+                    // 既存の画像パスがある場合（編集時）
+                    imageUri.value
+                }
+                else -> null
             }
 
             val selectedCategory = _selectedCategory.value ?: return@launch
@@ -210,7 +222,7 @@ class AddReviewViewModel(
                 id = editingReviewId ?: 0,
                 name = title.value,
                 favorite = isFavorite.value,
-                image = imagePath,
+                image = imagePath ?: currentReview?.image, // 既存の画像パスを保持
                 categoryId = selectedCategory.id,
                 genre = genre.value,
                 review = review.value,
@@ -219,7 +231,7 @@ class AddReviewViewModel(
                 itemScore3 = selectedCategory.item3?.let { itemScores.value[it]?.toDouble() },
                 itemScore4 = selectedCategory.item4?.let { itemScores.value[it]?.toDouble() },
                 itemScore5 = selectedCategory.item5?.let { itemScores.value[it]?.toDouble() },
-                createdDate = Date()
+                createdDate = currentReview?.createdDate ?: Date()
             )
 
             if (_isEditMode.value) {
@@ -227,6 +239,18 @@ class AddReviewViewModel(
             } else {
                 reviewRepository.insertReview(review)
             }
+
+            // 古い画像ファイルの削除（新しい画像が選択された場合のみ）
+            if (currentReview?.image != null && imagePath != null && currentReview.image != imagePath) {
+                deleteOldImage(currentReview.image)
+            }
+        }
+    }
+
+    private fun deleteOldImage(oldImagePath: String) {
+        val file = File(oldImagePath)
+        if (file.exists()) {
+            file.delete()
         }
     }
 }
