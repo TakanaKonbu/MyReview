@@ -62,7 +62,7 @@ fun EditCategoryScreen(
                 label = { Text("ジャンル名") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MainColor,
+                    focusedBorderColor = MainColor.value,
                     unfocusedBorderColor = Color.Gray
                 )
             )
@@ -85,7 +85,7 @@ fun EditCategoryScreen(
                         .fillMaxWidth()
                         .padding(bottom = 8.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = MainColor,
+                        focusedBorderColor = MainColor.value,
                         unfocusedBorderColor = Color.Gray
                     )
                 )
@@ -109,7 +109,7 @@ fun EditCategoryScreen(
                     onNavigateBack()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MainColor)
+                colors = ButtonDefaults.buttonColors(containerColor = MainColor.value)
             ) {
                 Text("更新", color = Color.White, fontSize = 20.sp)
             }
@@ -160,7 +160,7 @@ fun EditCategoryScreen(
             dismissButton = {
                 Button(
                     onClick = { showDeleteConfirmDialog = false },
-                    colors = ButtonDefaults.buttonColors(containerColor = MainColor),
+                    colors = ButtonDefaults.buttonColors(containerColor = MainColor.value),
                 ) {
                     Text("キャンセル", color = Color.White)
                 }

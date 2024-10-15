@@ -105,7 +105,7 @@ fun AddReviewScreen(
                 onClick = { launcher.launch("image/*") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MainColor
+                    containerColor = MainColor.value
                 )
             ) {
                 Text("画像を選択")
@@ -192,7 +192,7 @@ fun AddReviewScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "総評: ${String.format("%.1f", averageScore)}",
-                    color = MainColor,
+                    color = MainColor.value,
                     fontSize = 32.sp
                 )
 
@@ -212,9 +212,9 @@ fun AddReviewScreen(
                         valueRange = 1f..5f,
                         steps = 8,
                         colors = SliderDefaults.colors(
-                            thumbColor = MainColor,
-                            activeTrackColor = MainColor,
-                            inactiveTrackColor = MainColor.copy(alpha = 0.3f)
+                            thumbColor = MainColor.value,
+                            activeTrackColor = MainColor.value,
+                            inactiveTrackColor = MainColor.value.copy(alpha = 0.3f)
                         )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -230,7 +230,7 @@ fun AddReviewScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MainColor
+                    containerColor = MainColor.value
                 )
             ) {
                 Text(if (isEditMode) "更新" else "保存")

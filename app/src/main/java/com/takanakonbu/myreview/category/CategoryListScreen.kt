@@ -74,7 +74,7 @@ fun CategoryList(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            containerColor = MainColor
+            containerColor = MainColor.value
         ) {
             Icon(Icons.Filled.Add, contentDescription = "カテゴリーを追加", tint = Color.White)
         }
@@ -109,7 +109,7 @@ fun CategoryList(
             dismissButton = {
                 TextButton(
                     onClick = { showAdDialog = false },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor)
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor.value)
                 ) {
                     Text("キャンセル")
                 }
@@ -128,7 +128,7 @@ fun CategoryList(
                         showRewardEarnedDialog = false
                         onAddCategory()
                     },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor)
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor.value)
                 ) {
                     Text("カテゴリーを追加")
                 }
@@ -136,7 +136,7 @@ fun CategoryList(
             dismissButton = {
                 TextButton(
                     onClick = { showRewardEarnedDialog = false },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor)
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor.value)
                 ) {
                     Text("閉じる")
                 }

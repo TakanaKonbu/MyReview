@@ -2,6 +2,7 @@ package com.takanakonbu.myreview
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -9,17 +10,23 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.skydoves.colorpicker.compose.AlphaTile
+import com.github.skydoves.colorpicker.compose.HsvColorPicker
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import com.takanakonbu.myreview.ui.theme.MainColor
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,6 +48,9 @@ fun SettingsScreen(
     var restoreCompleted by remember { mutableStateOf(false) }
     val backupProgress by viewModel.backupProgress.collectAsState()
     val restoreProgress by viewModel.restoreProgress.collectAsState()
+    val mainColor by viewModel.mainColor.collectAsState(initial = MainColor)
+
+    var showColorPicker by remember { mutableStateOf(false) }
 
     val backupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -136,6 +146,45 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .clickable { showColorPicker = true }
+                .padding(vertical = 8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ColorLens,
+                contentDescription = "色の変更",
+                modifier = Modifier.size(36.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "色の変更",
+                style = MaterialTheme.typography.titleLarge
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(MainColor.value)
+            )
+        }
+
+        if (showColorPicker) {
+            ColorPickerDialog(
+                initialColor = MainColor.value,
+                onColorSelected = { color ->
+                    viewModel.updateMainColor(color)
+                    showColorPicker = false
+                },
+                onDismiss = { showColorPicker = false }
+            )
+        }
+
+        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Default.Warning,
@@ -156,4 +205,50 @@ fun SettingsScreen(
                     "\nバックアップデータには個人情報が含まれている可能性があるため、取り扱いには十分注意してください。"
         )
     }
+}
+
+@Composable
+fun ColorPickerDialog(
+    initialColor: Color,
+    onColorSelected: (Color) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val controller = rememberColorPickerController()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("色を選択") },
+        text = {
+            Column {
+                HsvColorPicker(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    controller = controller,
+                    initialColor = initialColor
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                AlphaTile(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
+                    controller = controller
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onColorSelected(controller.selectedColor.value)
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("キャンセル")
+            }
+        }
+    )
 }

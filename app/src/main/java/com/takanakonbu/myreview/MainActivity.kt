@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,7 +32,9 @@ import com.takanakonbu.myreview.review.ReviewDetailScreen
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.ui.theme.MyReviewTheme
 import com.google.android.gms.ads.MobileAds
+import com.takanakonbu.myreview.ui.theme.ColorManager
 import com.takanakonbu.myreview.ui.theme.MainColor
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var categoryRepository: CategoryRepository
@@ -45,6 +48,12 @@ class MainActivity : ComponentActivity() {
         val database = AppDatabase.getDatabase(applicationContext)
         categoryRepository = CategoryRepository(database.categoryDao())
         reviewRepository = ReviewRepository(database.reviewDao())
+
+        // 保存された色を読み込む
+        lifecycleScope.launch {
+            ColorManager.loadSavedColor(this@MainActivity)
+        }
+
         setContent {
             MyReviewTheme(darkTheme = false) {
                 MyReviewApp(categoryRepository, reviewRepository)
@@ -226,7 +235,7 @@ fun TopBar(
         },
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MainColor
+            containerColor = MainColor.value
         )
     )
 }

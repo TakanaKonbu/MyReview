@@ -52,7 +52,7 @@ fun AddReviewScreen(
                 placeholder = { Text("ジャンルを追加") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MainColor,
+                    focusedBorderColor = MainColor.value,
                     unfocusedBorderColor = Color.Gray
                 )
             )
@@ -75,7 +75,7 @@ fun AddReviewScreen(
                         .fillMaxWidth()
                         .padding(bottom = 8.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = MainColor,
+                        focusedBorderColor = MainColor.value,
                         unfocusedBorderColor = Color.Gray
                     )
                 )
@@ -90,7 +90,7 @@ fun AddReviewScreen(
                     onNavigateBack()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MainColor)
+                colors = ButtonDefaults.buttonColors(containerColor = MainColor.value)
             ) {
                 Text("保存", color = Color.White, fontSize = 20.sp)
             }

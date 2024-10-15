@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+    implementation ("com.github.skydoves:colorpicker-compose:1.0.4")
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
     implementation ("com.google.android.gms:play-services-ads:22.0.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.navigation:navigation-compose:2.7.5")
@@ -58,6 +60,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.datastore.core.android)
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     implementation("io.coil-kt:coil-compose:2.4.0")

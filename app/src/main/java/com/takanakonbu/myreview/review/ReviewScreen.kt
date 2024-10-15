@@ -72,7 +72,7 @@ fun ReviewListScreen(
             Column {
                 FloatingActionButton(
                     onClick = { showSearchDialog = true },
-                    containerColor = MainColor,
+                    containerColor = MainColor.value,
                     contentColor = Color.White
                 ) {
                     Icon(Icons.Default.Search, contentDescription = "検索")
@@ -80,7 +80,7 @@ fun ReviewListScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 FloatingActionButton(
                     onClick = { showSortDialog = true },
-                    containerColor = MainColor,
+                    containerColor = MainColor.value,
                     contentColor = Color.White
                 ) {
                     Icon(Icons.Filled.Sort, contentDescription = "並び替え")
@@ -94,7 +94,7 @@ fun ReviewListScreen(
                             navController.navigate("add_review/$categoryId/${Uri.encode(categoryName)}")
                         }
                     },
-                    containerColor = MainColor,
+                    containerColor = MainColor.value,
                     contentColor = Color.White
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = "レビュー追加")
@@ -262,7 +262,7 @@ fun ReviewListScreen(
             dismissButton = {
                 TextButton(
                     onClick = { showAdDialog = false },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor)
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor.value)
                 ) {
                     Text("キャンセル")
                 }
@@ -281,7 +281,7 @@ fun ReviewListScreen(
                         showRewardEarnedDialog = false
                         navController.navigate("add_review/$categoryId/${Uri.encode(categoryName)}")
                     },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor)
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor.value)
                 ) {
                     Text("レビューを追加")
                 }
@@ -289,7 +289,7 @@ fun ReviewListScreen(
             dismissButton = {
                 TextButton(
                     onClick = { showRewardEarnedDialog = false },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor)
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor.value)
                 ) {
                     Text("閉じる")
                 }
@@ -367,7 +367,7 @@ fun ReviewListItem(review: Review, onClick: () -> Unit) {
                 Text(
                     text = "総評: ${String.format("%.1f", averageScore)}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MainColor
+                    color = MainColor.value
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))

@@ -122,14 +122,14 @@ fun ReviewDetailScreen(
                     Text(
                         text = "総評",
                         style = MaterialTheme.typography.titleLarge,
-                        color = MainColor,
+                        color = MainColor.value,
                         modifier = Modifier.weight(1f)
                     )
 
                     Text(
                         text = "${String.format("%.1f", averageScore)}",
                         style = MaterialTheme.typography.titleLarge,
-                        color = MainColor,
+                        color = MainColor.value,
                         textAlign = TextAlign.End
                     )
                 }
@@ -228,7 +228,7 @@ fun ReviewDetailScreen(
                 // Edit and Delete buttons
                 Button(
                     onClick = { navController.navigate("edit_review/${reviewData.id}") },
-                    colors = ButtonDefaults.buttonColors(containerColor = MainColor),
+                    colors = ButtonDefaults.buttonColors(containerColor = MainColor.value),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("編集")

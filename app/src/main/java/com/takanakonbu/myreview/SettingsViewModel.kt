@@ -2,11 +2,13 @@ package com.takanakonbu.myreview
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import com.takanakonbu.myreview.ui.theme.ColorManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +27,8 @@ class SettingsViewModel(
 
     private val _restoreProgress = MutableStateFlow(0f)
     val restoreProgress: StateFlow<Float> = _restoreProgress
+
+    val mainColor = ColorManager.getMainColor(context)
 
     fun backupData(uri: Uri, onComplete: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -59,18 +63,18 @@ class SettingsViewModel(
                 _restoreProgress.value = 0.1f
                 val jsonString = withContext(Dispatchers.IO) {
                     context.contentResolver.openInputStream(uri)?.bufferedReader().use { it?.readText() }
-                } ?: throw Exception("Failed to read backup file")
+                } ?: throw Exception("バックアップファイルの読み込みに失敗しました")
                 _restoreProgress.value = 0.3f
 
                 val (categories, reviews) = JSONUtility.parseBackupJson(jsonString)
                 _restoreProgress.value = 0.5f
 
                 withContext(Dispatchers.IO) {
-                    // Clear existing data
+                    // 既存のデータを削除
                     categoryRepository.deleteAllCategories()
                     reviewRepository.deleteAllReviews()
 
-                    // Insert new data
+                    // 新しいデータを挿入
                     categories.forEach { categoryRepository.insertCategory(it) }
                     reviews.forEach { reviewRepository.insertReview(it) }
                 }
@@ -85,7 +89,12 @@ class SettingsViewModel(
         }
     }
 
-    // プログレスをリセットするメソッド
+    fun updateMainColor(color: Color) {
+        viewModelScope.launch {
+            ColorManager.setMainColor(context, color)
+        }
+    }
+
     fun resetProgress() {
         _backupProgress.value = 0f
         _restoreProgress.value = 0f
@@ -102,6 +111,6 @@ class SettingsViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return SettingsViewModel(context, categoryRepository, reviewRepository) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+        throw IllegalArgumentException("不明なViewModelクラスです")
     }
 }
