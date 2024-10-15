@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,6 +27,7 @@ import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.ReviewRepository
+import com.takanakonbu.myreview.ui.theme.DefaultMainColor
 import com.takanakonbu.myreview.ui.theme.MainColor
 import java.text.SimpleDateFormat
 import java.util.*
@@ -169,6 +171,28 @@ fun SettingsScreen(
                     .background(MainColor.value)
             )
         }
+        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .clickable { viewModel.updateMainColor(DefaultMainColor) }
+                .padding(vertical = 8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = "デフォルトカラーに戻す",
+                modifier = Modifier.size(36.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "デフォルトカラーに戻す",
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
+
 
         if (showColorPicker) {
             ColorPickerDialog(
