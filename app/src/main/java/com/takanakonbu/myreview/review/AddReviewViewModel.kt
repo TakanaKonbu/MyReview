@@ -205,6 +205,8 @@ class AddReviewViewModel(
                 editingReviewId?.let { reviewRepository.getReviewById(it) }
             } else null
 
+            val currentImage = currentReview?.image // 一時変数に保存
+
             val imagePath = when {
                 imageUri.value?.startsWith("content://") == true -> {
                     // 新しい画像が選択された場合
@@ -222,7 +224,7 @@ class AddReviewViewModel(
                 id = editingReviewId ?: 0,
                 name = title.value,
                 favorite = isFavorite.value,
-                image = imagePath ?: currentReview?.image, // 既存の画像パスを保持
+                image = imagePath ?: currentImage, // currentImage を使用
                 categoryId = selectedCategory.id,
                 genre = genre.value,
                 review = review.value,
@@ -241,8 +243,8 @@ class AddReviewViewModel(
             }
 
             // 古い画像ファイルの削除（新しい画像が選択された場合のみ）
-            if (currentReview?.image != null && imagePath != null && currentReview.image != imagePath) {
-                deleteOldImage(currentReview.image)
+            if (currentImage != null && imagePath != null && currentImage != imagePath) {
+                deleteOldImage(currentImage)
             }
         }
     }

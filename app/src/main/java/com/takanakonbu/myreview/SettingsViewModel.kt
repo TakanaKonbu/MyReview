@@ -2,6 +2,7 @@ package com.takanakonbu.myreview
 
 import android.content.Context
 import android.net.Uri
+import android.util.Base64
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class SettingsViewModel(
     private val context: Context,
@@ -39,7 +41,20 @@ class SettingsViewModel(
                 val reviews = reviewRepository.getAllReviews().first()
                 _backupProgress.value = 0.5f
 
-                val backupJson = JSONUtility.createBackupJson(categories, reviews)
+                // 画像をBase64エンコード
+                val reviewsWithEncodedImages = reviews.map { review ->
+                    review.apply {
+                        image?.let { imagePath ->
+                            val file = File(imagePath)
+                            if (file.exists()) {
+                                val bytes = file.readBytes()
+                                imageBase64 = Base64.encodeToString(bytes, Base64.DEFAULT)
+                            }
+                        }
+                    }
+                }
+
+                val backupJson = JSONUtility.createBackupJson(categories, reviewsWithEncodedImages)
                 _backupProgress.value = 0.7f
 
                 withContext(Dispatchers.IO) {
@@ -76,7 +91,15 @@ class SettingsViewModel(
 
                     // 新しいデータを挿入
                     categories.forEach { categoryRepository.insertCategory(it) }
-                    reviews.forEach { reviewRepository.insertReview(it) }
+                    reviews.forEach { review ->
+                        review.imageBase64?.let { base64 ->
+                            val bytes = Base64.decode(base64, Base64.DEFAULT)
+                            val file = File(context.filesDir, "review_image_${review.id}.jpg")
+                            file.writeBytes(bytes)
+                            review.image = file.absolutePath
+                        }
+                        reviewRepository.insertReview(review)
+                    }
                 }
 
                 _restoreProgress.value = 1f
