@@ -92,12 +92,12 @@ fun SettingsScreen(
             Icon(
                 imageVector = Icons.Default.CloudDownload,
                 contentDescription = "バックアップ",
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "バックアップ",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
         }
         if (backupProgress > 0 && backupProgress < 1) {
@@ -127,12 +127,12 @@ fun SettingsScreen(
             Icon(
                 imageVector = Icons.Default.CloudUpload,
                 contentDescription = "復元",
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "データの復元",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
         }
         if (restoreProgress > 0 && restoreProgress < 1) {
@@ -157,12 +157,12 @@ fun SettingsScreen(
             Icon(
                 imageVector = Icons.Default.ColorLens,
                 contentDescription = "色の変更",
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "色の変更",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.weight(1f))
             Box(
@@ -184,12 +184,12 @@ fun SettingsScreen(
             Icon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = "デフォルトカラーに戻す",
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "デフォルトカラーに戻す",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
         }
 
@@ -213,12 +213,12 @@ fun SettingsScreen(
             Icon(
                 imageVector = Icons.Default.Warning,
                 contentDescription = "注意事項",
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "注意事項",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
         }
 
