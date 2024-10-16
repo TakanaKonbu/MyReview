@@ -25,7 +25,9 @@ class CategoryViewModel(
     val maxCategories: StateFlow<Int> = _maxCategories.asStateFlow()
 
     private var rewardedAd: RewardedAd? = null
-    private val adUnitId = "ca-app-pub-2836653067032260/7608512459"
+//    本番広告
+//    private val adUnitId = "ca-app-pub-2836653067032260/7608512459"
+    private val adUnitId = "ca-app-pub-3940256099942544/5224354917"
 
     val allCategoriesWithReviewCount: StateFlow<List<CategoryWithReviewCount>> = categoryRepository.allCategories
         .map { categories ->
