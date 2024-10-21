@@ -1,6 +1,11 @@
 package com.takanakonbu.myreview.category
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -45,14 +50,48 @@ fun EditCategoryScreen(
         }
     }
 
-    Surface(
+    Scaffold(
         modifier = Modifier.fillMaxSize(),
-    ) {
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        floatingActionButton = {
+            Column {
+                FloatingActionButton(
+                    onClick = {
+                        category?.let {
+                            val updatedCategory = it.copy(
+                                name = name,
+                                item1 = items[0],
+                                item2 = items[1].takeIf { it.isNotBlank() },
+                                item3 = items[2].takeIf { it.isNotBlank() },
+                                item4 = items[3].takeIf { it.isNotBlank() },
+                                item5 = items[4].takeIf { it.isNotBlank() }
+                            )
+                            viewModel.updateCategory(updatedCategory)
+                        }
+                        onNavigateBack()
+                    },
+                    containerColor = MainColor.value,
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Filled.Done, contentDescription = "更新")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                FloatingActionButton(
+                    onClick = { showDeleteConfirmDialog = true },
+                    containerColor = MainColor.value,
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Filled.Delete, contentDescription = "削除")
+                }
+            }
+        }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -91,49 +130,7 @@ fun EditCategoryScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            Button(
-                onClick = {
-                    category?.let {
-                        val updatedCategory = it.copy(
-                            name = name,
-                            item1 = items[0],
-                            item2 = items[1].takeIf { it.isNotBlank() },
-                            item3 = items[2].takeIf { it.isNotBlank() },
-                            item4 = items[3].takeIf { it.isNotBlank() },
-                            item5 = items[4].takeIf { it.isNotBlank() }
-                        )
-                        viewModel.updateCategory(updatedCategory)
-                    }
-                    onNavigateBack()
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MainColor.value)
-            ) {
-                Text("更新", color = Color.White, fontSize = 20.sp)
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // キャンセルボタン
-            OutlinedButton(
-                onClick = onNavigateBack,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFD27778))
-            ) {
-                Text("キャンセル", fontSize = 20.sp)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // 削除ボタン
-            Button(
-                onClick = { showDeleteConfirmDialog = true },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778))
-            ) {
-                Text("削除", color = Color.White, fontSize = 20.sp)
-            }
+            Spacer(modifier = Modifier.height(80.dp)) // FABの下のスペース
         }
     }
 
@@ -152,7 +149,7 @@ fun EditCategoryScreen(
                         showDeleteConfirmDialog = false
                         onNavigateBack()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778)),
+                    colors = ButtonDefaults.buttonColors(containerColor = MainColor.value),
                 ) {
                     Text("削除", color = Color.White)
                 }
@@ -160,7 +157,7 @@ fun EditCategoryScreen(
             dismissButton = {
                 Button(
                     onClick = { showDeleteConfirmDialog = false },
-                    colors = ButtonDefaults.buttonColors(containerColor = MainColor.value),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
                 ) {
                     Text("キャンセル", color = Color.White)
                 }

@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -55,6 +57,25 @@ fun ReviewDetailScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        floatingActionButton = {
+            Column {
+                FloatingActionButton(
+                    onClick = { navController.navigate("edit_review/${review?.id}") },
+                    containerColor = MainColor.value,
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                FloatingActionButton(
+                    onClick = { showDeleteDialog = true },
+                    containerColor = MainColor.value,
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                }
+            }
+        }
     ) { paddingValues ->
         review?.let { reviewData ->
             Column(
@@ -134,7 +155,6 @@ fun ReviewDetailScreen(
                     )
                 }
 
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
@@ -197,7 +217,7 @@ fun ReviewDetailScreen(
                                 Text(
                                     text = item,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.weight(1f) // 余ったスペースを割り当てる
+                                    modifier = Modifier.weight(1f)
                                 )
                                 Text(
                                     text = "$it",
@@ -224,25 +244,6 @@ fun ReviewDetailScreen(
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
-
-                // Edit and Delete buttons
-                Button(
-                    onClick = { navController.navigate("edit_review/${reviewData.id}") },
-                    colors = ButtonDefaults.buttonColors(containerColor = MainColor.value),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("編集")
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Button(
-                    onClick = { showDeleteDialog = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("削除")
-                }
             }
 
             // Delete confirmation dialog
@@ -258,13 +259,16 @@ fun ReviewDetailScreen(
                                 showDeleteDialog = false
                                 onNavigateBack()
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778))
+                            colors = ButtonDefaults.buttonColors(containerColor = MainColor.value)
                         ) {
                             Text("削除")
                         }
                     },
                     dismissButton = {
-                        Button(onClick = { showDeleteDialog = false }) {
+                        Button(
+                            onClick = { showDeleteDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                        ) {
                             Text("キャンセル")
                         }
                     }

@@ -2,6 +2,7 @@ package com.takanakonbu.myreview.review
 
 import android.app.Activity
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -254,7 +255,7 @@ fun ReviewListScreen(
                             )
                         }
                     },
-                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFD27778))
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor.value)
                 ) {
                     Text("視聴する")
                 }
@@ -262,7 +263,7 @@ fun ReviewListScreen(
             dismissButton = {
                 TextButton(
                     onClick = { showAdDialog = false },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor.value)
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Gray)
                 ) {
                     Text("キャンセル")
                 }
@@ -305,7 +306,8 @@ fun ReviewListItem(review: Review, onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             modifier = Modifier

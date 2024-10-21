@@ -1,6 +1,7 @@
 package com.takanakonbu.myreview.category
 
 import android.app.Activity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -49,10 +50,12 @@ fun CategoryList(
         viewModel.loadRewardedAd()
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize(),) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+//            contentPadding = PaddingValues(16.dp)
         ) {
             items(categoriesWithReviewCount) { categoryWithCount ->
                 CategoryItem(
@@ -101,7 +104,7 @@ fun CategoryList(
                             )
                         }
                     },
-                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFD27778))
+                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor.value)
                 ) {
                     Text("視聴する")
                 }
@@ -109,7 +112,7 @@ fun CategoryList(
             dismissButton = {
                 TextButton(
                     onClick = { showAdDialog = false },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MainColor.value)
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Gray)
                 ) {
                     Text("キャンセル")
                 }

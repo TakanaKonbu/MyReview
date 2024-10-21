@@ -1,5 +1,6 @@
 package com.takanakonbu.myreview.category
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -94,16 +95,8 @@ fun AddReviewScreen(
             ) {
                 Text("保存", color = Color.White, fontSize = 20.sp)
             }
-            Spacer(modifier = Modifier.height(8.dp))
 
-            // キャンセルボタン
-            OutlinedButton(
-                onClick = onNavigateBack,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD27778))
-            ) {
-                Text("キャンセル", fontSize = 20.sp)
-            }
+
         }
     }
 }
