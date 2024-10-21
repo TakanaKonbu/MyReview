@@ -58,7 +58,11 @@ fun ReviewDetailScreen(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
-            Column {
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.Bottom,
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
                 FloatingActionButton(
                     onClick = { navController.navigate("edit_review/${review?.id}") },
                     containerColor = MainColor.value,
@@ -78,172 +82,173 @@ fun ReviewDetailScreen(
         }
     ) { paddingValues ->
         review?.let { reviewData ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = 140.dp) // FABのための余白
                 ) {
-                    Text(
-                        text = reviewData.name,
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.weight(1f)
-                    )
-                    if (reviewData.favorite) {
-                        Icon(
-                            Icons.Filled.Favorite,
-                            contentDescription = "Favorite",
-                            tint = Color.Red,
-                            modifier = Modifier.size(24.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = reviewData.name,
+                            style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier.weight(1f)
                         )
+                        if (reviewData.favorite) {
+                            Icon(
+                                Icons.Filled.Favorite,
+                                contentDescription = "Favorite",
+                                tint = Color.Red,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // Calculate and display average score
-                val averageScore = listOfNotNull(
-                    reviewData.itemScore1,
-                    reviewData.itemScore2,
-                    reviewData.itemScore3,
-                    reviewData.itemScore4,
-                    reviewData.itemScore5
-                ).average()
+                    // Calculate and display average score
+                    val averageScore = listOfNotNull(
+                        reviewData.itemScore1,
+                        reviewData.itemScore2,
+                        reviewData.itemScore3,
+                        reviewData.itemScore4,
+                        reviewData.itemScore5
+                    ).average()
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Display image if available
-                reviewData.image?.let { imagePath ->
-                    val imageFile = File(imagePath)
-                    if (imageFile.exists()) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(imageFile)
-                                .crossfade(true)
-                                .build(),
-                            contentDescription = "Review Image",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f),
-                            contentScale = ContentScale.Fit
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "総評",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MainColor.value,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Text(
-                        text = "${String.format("%.1f", averageScore)}",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MainColor.value,
-                        textAlign = TextAlign.End
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "ジャンル",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        text = "${if (reviewData.genre.isNullOrEmpty()) "未設定" else reviewData.genre}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
-                        textAlign = TextAlign.End
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "作成日",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        text = "${dateFormat.format(reviewData.createdDate)}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
-                        textAlign = TextAlign.End
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "評価",
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                category?.let { cat ->
-                    listOfNotNull(
-                        cat.item1 to reviewData.itemScore1,
-                        cat.item2?.let { it to reviewData.itemScore2 },
-                        cat.item3?.let { it to reviewData.itemScore3 },
-                        cat.item4?.let { it to reviewData.itemScore4 },
-                        cat.item5?.let { it to reviewData.itemScore5 }
-                    ).forEach { (item, score) ->
-                        score?.let {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = item,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                Text(
-                                    text = "$it",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    textAlign = TextAlign.End
-                                )
-                            }
-                            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                    // Display image if available
+                    reviewData.image?.let { imagePath ->
+                        val imageFile = File(imagePath)
+                        if (imageFile.exists()) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(imageFile)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "Review Image",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1f),
+                                contentScale = ContentScale.Fit
+                            )
                             Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "総評",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MainColor.value,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Text(
+                            text = "${String.format("%.1f", averageScore)}",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MainColor.value,
+                            textAlign = TextAlign.End
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "ジャンル",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = "${if (reviewData.genre.isNullOrEmpty()) "未設定" else reviewData.genre}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray,
+                            textAlign = TextAlign.End
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "作成日",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = "${dateFormat.format(reviewData.createdDate)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray,
+                            textAlign = TextAlign.End
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "評価",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    category?.let { cat ->
+                        listOfNotNull(
+                            cat.item1 to reviewData.itemScore1,
+                            cat.item2?.let { it to reviewData.itemScore2 },
+                            cat.item3?.let { it to reviewData.itemScore3 },
+                            cat.item4?.let { it to reviewData.itemScore4 },
+                            cat.item5?.let { it to reviewData.itemScore5 }
+                        ).forEach { (item, score) ->
+                            score?.let {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = item,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Text(
+                                        text = "$it",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        textAlign = TextAlign.End
+                                    )
+                                }
+                                HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "レビュー",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = reviewData.review,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "レビュー",
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = reviewData.review,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
             }
 
             // Delete confirmation dialog
