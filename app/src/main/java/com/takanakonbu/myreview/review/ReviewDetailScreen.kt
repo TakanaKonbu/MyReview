@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -146,14 +147,14 @@ fun ReviewDetailScreen(
                     ) {
                         Text(
                             text = "総評",
-                            style = MaterialTheme.typography.titleLarge,
+                            fontSize = 32.sp,
                             color = MainColor.value,
                             modifier = Modifier.weight(1f)
                         )
 
                         Text(
                             text = "${String.format("%.1f", averageScore)}",
-                            style = MaterialTheme.typography.titleLarge,
+                            fontSize = 32.sp,
                             color = MainColor.value,
                             textAlign = TextAlign.End
                         )
@@ -225,7 +226,7 @@ fun ReviewDetailScreen(
                                     )
                                     Text(
                                         text = "⭐️$it",
-                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontSize = 20.sp,
                                         textAlign = TextAlign.End
                                     )
                                 }

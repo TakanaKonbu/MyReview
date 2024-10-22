@@ -54,35 +54,12 @@ fun EditCategoryScreen(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
-            Column {
-                FloatingActionButton(
-                    onClick = {
-                        category?.let {
-                            val updatedCategory = it.copy(
-                                name = name,
-                                item1 = items[0],
-                                item2 = items[1].takeIf { it.isNotBlank() },
-                                item3 = items[2].takeIf { it.isNotBlank() },
-                                item4 = items[3].takeIf { it.isNotBlank() },
-                                item5 = items[4].takeIf { it.isNotBlank() }
-                            )
-                            viewModel.updateCategory(updatedCategory)
-                        }
-                        onNavigateBack()
-                    },
-                    containerColor = MainColor.value,
-                    contentColor = Color.White
-                ) {
-                    Icon(Icons.Filled.Done, contentDescription = "更新")
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                FloatingActionButton(
-                    onClick = { showDeleteConfirmDialog = true },
-                    containerColor = MainColor.value,
-                    contentColor = Color.White
-                ) {
-                    Icon(Icons.Filled.Delete, contentDescription = "削除")
-                }
+            FloatingActionButton(
+                onClick = { showDeleteConfirmDialog = true },
+                containerColor = MainColor.value,
+                contentColor = Color.White
+            ) {
+                Icon(Icons.Filled.Delete, contentDescription = "削除")
             }
         }
     ) { paddingValues ->
@@ -129,8 +106,28 @@ fun EditCategoryScreen(
                     )
                 )
             }
-
-            Spacer(modifier = Modifier.height(80.dp)) // FABの下のスペース
+            Button(
+                onClick = {
+                    category?.let {
+                        val updatedCategory = it.copy(
+                            name = name,
+                            item1 = items[0],
+                            item2 = items[1].takeIf { it.isNotBlank() },
+                            item3 = items[2].takeIf { it.isNotBlank() },
+                            item4 = items[3].takeIf { it.isNotBlank() },
+                            item5 = items[4].takeIf { it.isNotBlank() }
+                        )
+                        viewModel.updateCategory(updatedCategory)
+                        onNavigateBack()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MainColor.value
+                )
+            ) {
+                Text("更新")
+            }
         }
     }
 
