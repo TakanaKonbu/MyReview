@@ -80,7 +80,8 @@ fun EditCategoryScreen(
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = MainColor.value,
                     unfocusedBorderColor = Color.Gray
-                )
+                ),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -103,7 +104,8 @@ fun EditCategoryScreen(
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = MainColor.value,
                         unfocusedBorderColor = Color.Gray
-                    )
+                    ),
+                    singleLine = true
                 )
             }
             Button(

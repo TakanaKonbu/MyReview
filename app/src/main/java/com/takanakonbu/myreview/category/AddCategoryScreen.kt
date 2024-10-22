@@ -55,7 +55,8 @@ fun AddReviewScreen(
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = MainColor.value,
                     unfocusedBorderColor = Color.Gray
-                )
+                ),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -78,7 +79,8 @@ fun AddReviewScreen(
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = MainColor.value,
                         unfocusedBorderColor = Color.Gray
-                    )
+                    ),
+                    singleLine = true
                 )
             }
 

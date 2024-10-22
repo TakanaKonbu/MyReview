@@ -89,7 +89,8 @@ fun AddReviewScreen(
                     value = title,
                     onValueChange = { viewModel.setTitle(it) },
                     label = { Text("タイトル") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true
                 )
                 IconButton(onClick = { viewModel.toggleFavorite() }) {
                     Icon(
@@ -160,7 +161,8 @@ fun AddReviewScreen(
                 value = genre,
                 onValueChange = { viewModel.setGenre(it) },
                 label = { Text("ジャンル") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
