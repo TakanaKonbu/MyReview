@@ -198,7 +198,7 @@ fun ReviewDetailScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     Text(
                         text = "評価",
@@ -224,7 +224,7 @@ fun ReviewDetailScreen(
                                         modifier = Modifier.weight(1f)
                                     )
                                     Text(
-                                        text = "$it",
+                                        text = "⭐️$it",
                                         style = MaterialTheme.typography.bodyLarge,
                                         textAlign = TextAlign.End
                                     )
@@ -235,7 +235,7 @@ fun ReviewDetailScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     Text(
                         text = "レビュー",
