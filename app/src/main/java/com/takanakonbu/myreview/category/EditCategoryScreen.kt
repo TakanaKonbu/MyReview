@@ -75,7 +75,7 @@ fun EditCategoryScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("ジャンル名") },
+                label = { Text("カテゴリー名") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = MainColor.value,

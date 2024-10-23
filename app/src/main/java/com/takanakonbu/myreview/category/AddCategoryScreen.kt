@@ -50,7 +50,7 @@ fun AddReviewScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { viewModel.updateNewCategoryName(it) },
-                placeholder = { Text("ジャンルを追加") },
+                placeholder = { Text("カテゴリーを追加") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = MainColor.value,
