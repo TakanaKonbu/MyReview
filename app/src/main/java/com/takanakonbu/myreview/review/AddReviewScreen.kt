@@ -1,18 +1,42 @@
 package com.takanakonbu.myreview.review
 
-import AddReviewViewModel
-import AddReviewViewModelFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,9 +63,9 @@ fun AddReviewScreen(
     val context = LocalContext.current
     val viewModel: AddReviewViewModel = viewModel(
         factory = AddReviewViewModelFactory(
-            context,
-            CategoryRepository(AppDatabase.getDatabase(context).categoryDao()),
-            ReviewRepository(AppDatabase.getDatabase(context).reviewDao())
+            context = context,
+            categoryRepository = CategoryRepository(AppDatabase.getDatabase(context).categoryDao()),
+            reviewRepository = ReviewRepository(AppDatabase.getDatabase(context).reviewDao())
         )
     )
 
@@ -64,10 +88,11 @@ fun AddReviewScreen(
         uri?.let { viewModel.setImageUri(it.toString()) }
     }
 
-    LaunchedEffect(reviewId, categoryId, categoryName) {
-        reviewId?.let { viewModel.loadReviewForEditing(it) }
-        if (reviewId == null && categoryId != null && categoryName != null) {
-            viewModel.setSelectedCategoryId(categoryId)
+    LaunchedEffect(Unit) {
+        if (reviewId != null) {
+            viewModel.loadReviewForEditing(reviewId)
+        } else if (categoryId != null) {
+            viewModel.prepareNewReview(categoryId)
         }
     }
 
@@ -126,31 +151,35 @@ fun AddReviewScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
-            ) {
-                TextField(
-                    value = selectedCategory?.name ?: categoryName ?: "",
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("カテゴリー") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
-                )
-
-                ExposedDropdownMenu(
+            Box {
+                ExposedDropdownMenuBox(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    onExpandedChange = { expanded = !expanded }
                 ) {
-                    categories.forEach { category ->
-                        DropdownMenuItem(
-                            text = { Text(category.name) },
-                            onClick = {
-                                viewModel.setSelectedCategoryId(category.id)
-                                expanded = false
-                            }
-                        )
+                    TextField(
+                        value = selectedCategory?.name ?: categoryName ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("カテゴリー") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        categories.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(category.name) },
+                                onClick = {
+                                    viewModel.setSelectedCategoryId(category.id)
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -186,13 +215,14 @@ fun AddReviewScreen(
                     category.item5
                 )
 
-                // 総評の計算と表示
                 val averageScore = if (itemScores.isNotEmpty()) {
                     itemScores.values.average().toFloat()
                 } else {
                     0f
                 }
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = "総評: ${String.format("%.1f", averageScore)}",
                     color = MainColor.value,
