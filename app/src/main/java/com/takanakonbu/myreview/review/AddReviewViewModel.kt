@@ -37,7 +37,6 @@ class AddReviewViewModel(
     val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
 
     private val _selectedCategoryId = MutableStateFlow<Int?>(null)
-    val selectedCategoryId: StateFlow<Int?> = _selectedCategoryId.asStateFlow()
 
     private val _selectedCategory = MutableStateFlow<Category?>(null)
     val selectedCategory: StateFlow<Category?> = _selectedCategory.asStateFlow()

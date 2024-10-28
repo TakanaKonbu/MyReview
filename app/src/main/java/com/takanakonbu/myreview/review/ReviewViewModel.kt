@@ -1,4 +1,4 @@
-package com.takanakonbu.myreview.review.data
+package com.takanakonbu.myreview.review
 
 import android.app.Activity
 import android.content.Context
@@ -10,6 +10,8 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.takanakonbu.myreview.category.data.Category
 import com.takanakonbu.myreview.category.data.CategoryRepository
+import com.takanakonbu.myreview.review.data.Review
+import com.takanakonbu.myreview.review.data.ReviewRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -23,16 +25,18 @@ enum class SortOrder {
 class ReviewViewModel(
     private val reviewRepository: ReviewRepository,
     private val categoryRepository: CategoryRepository,
-    private val context: Context
+    context: Context
 ) : ViewModel() {
+    private val applicationContext = context.applicationContext
 
     private var _maxReviews = MutableStateFlow(5)
     val maxReviews: StateFlow<Int> = _maxReviews.asStateFlow()
 
     private var rewardedAd: RewardedAd? = null
-//    本番広告
+    //    本番広告
 //    private val adUnitId = "ca-app-pub-2836653067032260/7608512459"
     private val adUnitId = "ca-app-pub-3940256099942544/5224354917"
+
     private val _reviews = MutableStateFlow<List<Review>>(emptyList())
     val reviews: StateFlow<List<Review>> = _reviews.asStateFlow()
 
@@ -94,7 +98,6 @@ class ReviewViewModel(
         }
     }
 
-
     fun deleteReview(review: Review) = viewModelScope.launch {
         reviewRepository.deleteReview(review)
     }
@@ -116,7 +119,7 @@ class ReviewViewModel(
 
     fun loadRewardedAd() {
         val adRequest = AdRequest.Builder().build()
-        RewardedAd.load(context, adUnitId, adRequest, object : RewardedAdLoadCallback() {
+        RewardedAd.load(applicationContext, adUnitId, adRequest, object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 rewardedAd = null
             }
@@ -136,7 +139,7 @@ class ReviewViewModel(
                     onAdDismissed()
                 }
             }
-            ad.show(activity) { rewardItem ->
+            ad.show(activity) { _ ->
                 _maxReviews.value += 2
                 onRewardEarned()
             }

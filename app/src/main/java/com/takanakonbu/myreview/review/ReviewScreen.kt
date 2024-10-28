@@ -2,13 +2,13 @@ package com.takanakonbu.myreview.review
 
 import android.app.Activity
 import android.net.Uri
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,20 +27,15 @@ import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.Review
 import com.takanakonbu.myreview.review.data.ReviewRepository
-import com.takanakonbu.myreview.review.data.ReviewViewModel
-import com.takanakonbu.myreview.review.data.ReviewViewModelFactory
-import com.takanakonbu.myreview.review.data.SortOrder
 import com.takanakonbu.myreview.ui.theme.MainColor
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewListScreen(
     categoryId: Int,
     categoryName: String,
-    onNavigateBack: () -> Unit,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -84,7 +79,7 @@ fun ReviewListScreen(
                     containerColor = MainColor.value,
                     contentColor = Color.White
                 ) {
-                    Icon(Icons.Filled.Sort, contentDescription = "並び替え")
+                    Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "並び替え")
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 FloatingActionButton(
@@ -367,7 +362,7 @@ fun ReviewListItem(review: Review, onClick: () -> Unit) {
                 ).average()
 
                 Text(
-                    text = "総評: ${String.format("%.1f", averageScore)}",
+                    text = "総評: ${String.format(Locale.US, "%.1f", averageScore)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MainColor.value
                 )

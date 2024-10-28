@@ -24,14 +24,11 @@ import coil.request.ImageRequest
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.ReviewRepository
-import com.takanakonbu.myreview.review.data.ReviewViewModel
-import com.takanakonbu.myreview.review.data.ReviewViewModelFactory
 import com.takanakonbu.myreview.ui.theme.MainColor
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewDetailScreen(
     reviewId: Int,
@@ -153,7 +150,7 @@ fun ReviewDetailScreen(
                         )
 
                         Text(
-                            text = "${String.format("%.1f", averageScore)}",
+                            text = String.format(Locale.US, "%.1f", averageScore),
                             fontSize = 32.sp,
                             color = MainColor.value,
                             textAlign = TextAlign.End
@@ -172,7 +169,7 @@ fun ReviewDetailScreen(
                             modifier = Modifier.weight(1f)
                         )
                         Text(
-                            text = "${if (reviewData.genre.isNullOrEmpty()) "未設定" else reviewData.genre}",
+                            text = if (reviewData.genre.isNullOrEmpty()) "未設定" else reviewData.genre,
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                             textAlign = TextAlign.End
@@ -192,7 +189,7 @@ fun ReviewDetailScreen(
                             modifier = Modifier.weight(1f)
                         )
                         Text(
-                            text = "${dateFormat.format(reviewData.createdDate)}",
+                            text = dateFormat.format(reviewData.createdDate),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                             textAlign = TextAlign.End

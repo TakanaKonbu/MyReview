@@ -157,7 +157,7 @@ fun MyReviewApp(categoryRepository: CategoryRepository, reviewRepository: Review
                 ReviewListScreen(
                     categoryId = categoryId,
                     categoryName = categoryName,
-                    onNavigateBack = { navController.popBackStack() },
+
                     navController = navController
                 )
             }

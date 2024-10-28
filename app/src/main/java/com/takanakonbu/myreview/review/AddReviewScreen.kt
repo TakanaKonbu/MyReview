@@ -50,6 +50,7 @@ import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.ui.theme.MainColor
+import java.util.Locale
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,7 +72,6 @@ fun AddReviewScreen(
 
     val title by viewModel.title.collectAsState()
     val isFavorite by viewModel.isFavorite.collectAsState()
-    val selectedCategoryId by viewModel.selectedCategoryId.collectAsState()
     val genre by viewModel.genre.collectAsState()
     val review by viewModel.review.collectAsState()
     val itemScores by viewModel.itemScores.collectAsState()
@@ -224,7 +224,8 @@ fun AddReviewScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "総評: ${String.format("%.1f", averageScore)}",
+                    // Localeを明示的に指定
+                    text = "総評: ${String.format(Locale.US, "%.1f", averageScore)}",
                     color = MainColor.value,
                     fontSize = 32.sp
                 )
@@ -235,7 +236,7 @@ fun AddReviewScreen(
                     val score = itemScores[item] ?: 1f
                     val roundedScore = (score * 2).roundToInt() / 2f
 
-                    Text(text = "$item: ${String.format("%.1f", roundedScore)}")
+                    Text(text = "$item: ${String.format(Locale.US, "%.1f", roundedScore)}")
                     Slider(
                         value = score,
                         onValueChange = { newValue ->
