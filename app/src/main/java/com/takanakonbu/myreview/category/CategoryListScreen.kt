@@ -19,9 +19,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
-import com.takanakonbu.myreview.category.ui.CategoryViewModel
-import com.takanakonbu.myreview.category.ui.CategoryViewModelFactory
-import com.takanakonbu.myreview.category.ui.CategoryWithReviewCount
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.ui.theme.MainColor
 
