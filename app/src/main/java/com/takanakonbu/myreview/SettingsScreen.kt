@@ -1,5 +1,9 @@
 package com.takanakonbu.myreview
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -13,6 +17,7 @@ import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Web
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -203,6 +208,48 @@ fun SettingsScreen(
                 },
                 onDismiss = { showColorPicker = false }
             )
+        }
+
+        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+        ) {
+            // LocalContext を remember で保持
+            val context = LocalContext.current
+
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        //本番では指定のURLに変更
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://takanakonbu.fun"))
+                        try {
+                            context.startActivity(intent)
+                        } catch (e: ActivityNotFoundException) {
+                            Toast.makeText(context, "ブラウザを開けません", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Web,
+                        contentDescription = "プライバシーポリシー",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "プライバシーポリシー",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
         }
 
         HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
