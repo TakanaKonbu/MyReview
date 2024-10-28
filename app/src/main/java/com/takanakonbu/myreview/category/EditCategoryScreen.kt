@@ -5,24 +5,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.Category
 import com.takanakonbu.myreview.category.data.CategoryRepository
-import com.takanakonbu.myreview.category.ui.CategoryViewModel
-import com.takanakonbu.myreview.category.ui.CategoryViewModelFactory
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.ui.theme.MainColor
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditCategoryScreen(
     categoryId: Int,
@@ -77,7 +72,7 @@ fun EditCategoryScreen(
                 onValueChange = { name = it },
                 label = { Text("カテゴリー名") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
+                colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MainColor.value,
                     unfocusedBorderColor = Color.Gray
                 ),
@@ -101,7 +96,7 @@ fun EditCategoryScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                    colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MainColor.value,
                         unfocusedBorderColor = Color.Gray
                     ),
@@ -110,14 +105,14 @@ fun EditCategoryScreen(
             }
             Button(
                 onClick = {
-                    category?.let {
-                        val updatedCategory = it.copy(
+                    category?.let { currentCategory ->
+                        val updatedCategory = currentCategory.copy(
                             name = name,
                             item1 = items[0],
-                            item2 = items[1].takeIf { it.isNotBlank() },
-                            item3 = items[2].takeIf { it.isNotBlank() },
-                            item4 = items[3].takeIf { it.isNotBlank() },
-                            item5 = items[4].takeIf { it.isNotBlank() }
+                            item2 = items[1].takeIf { input -> input.isNotBlank() },
+                            item3 = items[2].takeIf { input -> input.isNotBlank() },
+                            item4 = items[3].takeIf { input -> input.isNotBlank() },
+                            item5 = items[4].takeIf { input -> input.isNotBlank() }
                         )
                         viewModel.updateCategory(updatedCategory)
                         onNavigateBack()

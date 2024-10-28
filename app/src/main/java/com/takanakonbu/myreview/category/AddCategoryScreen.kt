@@ -1,6 +1,5 @@
 package com.takanakonbu.myreview.category
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,12 +12,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
-import com.takanakonbu.myreview.category.ui.CategoryViewModel
-import com.takanakonbu.myreview.category.ui.CategoryViewModelFactory
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.ui.theme.MainColor
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddReviewScreen(
     onNavigateBack: () -> Unit
@@ -52,7 +48,7 @@ fun AddReviewScreen(
                 onValueChange = { viewModel.updateNewCategoryName(it) },
                 placeholder = { Text("カテゴリーを追加") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
+                colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MainColor.value,
                     unfocusedBorderColor = Color.Gray
                 ),
@@ -76,7 +72,7 @@ fun AddReviewScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                    colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MainColor.value,
                         unfocusedBorderColor = Color.Gray
                     ),

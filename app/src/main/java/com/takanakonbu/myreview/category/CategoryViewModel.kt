@@ -1,4 +1,4 @@
-package com.takanakonbu.myreview.category.ui
+package com.takanakonbu.myreview.category
 
 import android.app.Activity
 import android.content.Context
@@ -18,14 +18,15 @@ import java.util.Date
 class CategoryViewModel(
     private val categoryRepository: CategoryRepository,
     private val reviewRepository: ReviewRepository,
-    private val context: Context
+    context: Context
 ) : ViewModel() {
+    private val applicationContext = context.applicationContext
 
     private var _maxCategories = MutableStateFlow(3)
     val maxCategories: StateFlow<Int> = _maxCategories.asStateFlow()
 
     private var rewardedAd: RewardedAd? = null
-//    本番広告
+    //    本番広告
 //    private val adUnitId = "ca-app-pub-2836653067032260/7608512459"
     private val adUnitId = "ca-app-pub-3940256099942544/5224354917"
 
@@ -97,7 +98,7 @@ class CategoryViewModel(
 
     fun loadRewardedAd() {
         val adRequest = AdRequest.Builder().build()
-        RewardedAd.load(context, adUnitId, adRequest, object : RewardedAdLoadCallback() {
+        RewardedAd.load(applicationContext, adUnitId, adRequest, object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 rewardedAd = null
             }
@@ -117,7 +118,7 @@ class CategoryViewModel(
                     onAdDismissed()
                 }
             }
-            ad.show(activity) { rewardItem ->
+            ad.show(activity) { _ ->
                 _maxCategories.value += 1
                 onRewardEarned()
             }
