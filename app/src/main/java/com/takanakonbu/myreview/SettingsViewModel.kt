@@ -19,18 +19,18 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class SettingsViewModel(
-    private val context: Context,
+    context: Context,  // contextをプロパティとして保持しない
     private val categoryRepository: CategoryRepository,
     private val reviewRepository: ReviewRepository
 ) : ViewModel() {
+    // applicationContextを使用してメモリリークを防ぐ
+    private val applicationContext = context.applicationContext
 
     private val _backupProgress = MutableStateFlow(0f)
     val backupProgress: StateFlow<Float> = _backupProgress
 
     private val _restoreProgress = MutableStateFlow(0f)
     val restoreProgress: StateFlow<Float> = _restoreProgress
-
-    val mainColor = ColorManager.getMainColor(context)
 
     fun backupData(uri: Uri, onComplete: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -58,7 +58,7 @@ class SettingsViewModel(
                 _backupProgress.value = 0.7f
 
                 withContext(Dispatchers.IO) {
-                    context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    applicationContext.contentResolver.openOutputStream(uri)?.use { outputStream ->
                         outputStream.write(backupJson.toByteArray())
                     }
                 }
@@ -77,7 +77,7 @@ class SettingsViewModel(
             try {
                 _restoreProgress.value = 0.1f
                 val jsonString = withContext(Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)?.bufferedReader().use { it?.readText() }
+                    applicationContext.contentResolver.openInputStream(uri)?.bufferedReader().use { it?.readText() }
                 } ?: throw Exception("バックアップファイルの読み込みに失敗しました")
                 _restoreProgress.value = 0.3f
 
@@ -94,7 +94,7 @@ class SettingsViewModel(
                     reviews.forEach { review ->
                         review.imageBase64?.let { base64 ->
                             val bytes = Base64.decode(base64, Base64.DEFAULT)
-                            val file = File(context.filesDir, "review_image_${review.id}.jpg")
+                            val file = File(applicationContext.filesDir, "review_image_${review.id}.jpg")
                             file.writeBytes(bytes)
                             review.image = file.absolutePath
                         }
@@ -114,13 +114,8 @@ class SettingsViewModel(
 
     fun updateMainColor(color: Color) {
         viewModelScope.launch {
-            ColorManager.setMainColor(context, color)
+            ColorManager.setMainColor(applicationContext, color)
         }
-    }
-
-    fun resetProgress() {
-        _backupProgress.value = 0f
-        _restoreProgress.value = 0f
     }
 }
 

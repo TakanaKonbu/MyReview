@@ -5,27 +5,18 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.takanakonbu.myreview.category.data.Category
 import com.takanakonbu.myreview.review.data.Review
-import java.util.Date
 
 object JSONUtility {
-    val gson: Gson = GsonBuilder()
+    private val gson: Gson = GsonBuilder()
         .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
         .create()
 
-    fun categoriesToJson(categories: List<Category>): String {
-        return gson.toJson(categories)
-    }
-
-    fun reviewsToJson(reviews: List<Review>): String {
-        return gson.toJson(reviews)
-    }
-
-    fun jsonToCategories(json: String): List<Category> {
+    private fun jsonToCategories(json: String): List<Category> {
         val type = object : TypeToken<List<Category>>() {}.type
         return gson.fromJson(json, type)
     }
 
-    fun jsonToReviews(json: String): List<Review> {
+    private fun jsonToReviews(json: String): List<Review> {
         val type = object : TypeToken<List<Review>>() {}.type
         return gson.fromJson(json, type)
     }

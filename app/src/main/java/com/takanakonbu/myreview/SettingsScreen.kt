@@ -23,7 +23,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,7 +38,6 @@ import java.util.*
 
 @Composable
 fun SettingsScreen(
-    onNavigateBack: () -> Unit,
     categoryRepository: CategoryRepository,
     reviewRepository: ReviewRepository
 ) {
@@ -50,12 +48,11 @@ fun SettingsScreen(
             reviewRepository
         )
     )
-    val context = LocalContext.current
+
     var backupCompleted by remember { mutableStateOf(false) }
     var restoreCompleted by remember { mutableStateOf(false) }
     val backupProgress by viewModel.backupProgress.collectAsState()
     val restoreProgress by viewModel.restoreProgress.collectAsState()
-    val mainColor by viewModel.mainColor.collectAsState(initial = MainColor)
 
     var showColorPicker by remember { mutableStateOf(false) }
 
@@ -107,8 +104,8 @@ fun SettingsScreen(
         }
         if (backupProgress > 0 && backupProgress < 1) {
             LinearProgressIndicator(
-                progress = backupProgress,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                progress = { backupProgress },
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             )
         }
         if (backupCompleted) {
@@ -142,8 +139,8 @@ fun SettingsScreen(
         }
         if (restoreProgress > 0 && restoreProgress < 1) {
             LinearProgressIndicator(
-                progress = restoreProgress,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                progress = { restoreProgress },
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             )
         }
         if (restoreCompleted) {

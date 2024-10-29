@@ -62,7 +62,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyReviewApp(categoryRepository: CategoryRepository, reviewRepository: ReviewRepository) {
     val navController = rememberNavController()
@@ -203,7 +202,6 @@ fun MyReviewApp(categoryRepository: CategoryRepository, reviewRepository: Review
 
             composable("settings") {
                 SettingsScreen(
-                    onNavigateBack = { navController.popBackStack() },
                     categoryRepository = categoryRepository,
                     reviewRepository = reviewRepository
                 )
