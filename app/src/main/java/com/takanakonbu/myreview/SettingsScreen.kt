@@ -222,8 +222,7 @@ fun SettingsScreen(
             Box(
                 modifier = Modifier
                     .clickable {
-                        //本番では指定のURLに変更
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://takanakonbu.fun"))
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://takanakonbu.fun/my-review%e3%82%a2%e3%83%97%e3%83%aa/"))
                         try {
                             context.startActivity(intent)
                         } catch (e: ActivityNotFoundException) {
