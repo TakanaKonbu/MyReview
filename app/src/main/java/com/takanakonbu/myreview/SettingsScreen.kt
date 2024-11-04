@@ -222,7 +222,7 @@ fun SettingsScreen(
             Box(
                 modifier = Modifier
                     .clickable {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://takanakonbu.fun/my-review%e3%82%a2%e3%83%97%e3%83%aa/"))
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://takanakonbu.fun/my-review-app/"))
                         try {
                             context.startActivity(intent)
                         } catch (e: ActivityNotFoundException) {
