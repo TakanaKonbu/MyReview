@@ -1,5 +1,6 @@
 package com.takanakonbu.myreview.review
 
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -7,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +25,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.takanakonbu.myreview.category.data.AppDatabase
 import com.takanakonbu.myreview.category.data.CategoryRepository
+import com.takanakonbu.myreview.review.data.Review
 import com.takanakonbu.myreview.review.data.ReviewRepository
 import com.takanakonbu.myreview.ui.theme.MainColor
 import java.io.File
@@ -52,6 +55,31 @@ fun ReviewDetailScreen(
         viewModel.loadReviewById(reviewId)
     }
 
+    fun shareReview(review: Review) {
+        // レビュー内容をTwitter向けにフォーマット
+        val shareText = buildString {
+            append("『${review.name}』\n")
+            append("総評: ${String.format(Locale.US, "%.1f", listOfNotNull(
+                review.itemScore1,
+                review.itemScore2,
+                review.itemScore3,
+                review.itemScore4,
+                review.itemScore5
+            ).average())}⭐️\n\n")
+            if (!review.genre.isNullOrEmpty()) {
+                append("ジャンル: ${review.genre}\n")
+            }
+            append(review.review)        }
+
+        val intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
+        }
+
+        context.startActivity(Intent.createChooser(intent, "レビューをシェア"))
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -61,6 +89,14 @@ fun ReviewDetailScreen(
                 verticalArrangement = Arrangement.Bottom,
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
+                FloatingActionButton(
+                    onClick = { review?.let { shareReview(it) } },
+                    containerColor = MainColor.value,
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Filled.Share, contentDescription = "Share")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
                 FloatingActionButton(
                     onClick = { navController.navigate("edit_review/${review?.id}") },
                     containerColor = MainColor.value,
