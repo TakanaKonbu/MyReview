@@ -97,21 +97,24 @@ fun ReviewDetailScreen(
                     Icon(Icons.Filled.Share, contentDescription = "Share")
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                FloatingActionButton(
-                    onClick = { navController.navigate("edit_review/${review?.id}") },
-                    containerColor = MainColor.value,
-                    contentColor = Color.White
-                ) {
-                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                Row(){
+                    FloatingActionButton(
+                        onClick = { navController.navigate("edit_review/${review?.id}") },
+                        containerColor = MainColor.value,
+                        contentColor = Color.White
+                    ) {
+                        Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    FloatingActionButton(
+                        onClick = { showDeleteDialog = true },
+                        containerColor = MainColor.value,
+                        contentColor = Color.White
+                    ) {
+                        Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                    }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                FloatingActionButton(
-                    onClick = { showDeleteDialog = true },
-                    containerColor = MainColor.value,
-                    contentColor = Color.White
-                ) {
-                    Icon(Icons.Filled.Delete, contentDescription = "Delete")
-                }
+
             }
         }
     ) { paddingValues ->
