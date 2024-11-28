@@ -47,6 +47,16 @@ class CategoryViewModel(
     private val _newCategoryItems = MutableStateFlow(List(5) { "" })
     val newCategoryItems: StateFlow<List<String>> = _newCategoryItems.asStateFlow()
 
+    private val _visibleItemCount = MutableStateFlow(1)
+    val visibleItemCount: StateFlow<Int> = _visibleItemCount.asStateFlow()
+
+    private fun reorganizeItems(items: List<String>): List<String> {
+        val nonEmptyItems = items.filter { it.isNotBlank() }
+        return List(5) { index ->
+            nonEmptyItems.getOrElse(index) { "" }
+        }
+    }
+
     fun insertCategory() {
         val name = _newCategoryName.value
         val items = _newCategoryItems.value
@@ -82,14 +92,29 @@ class CategoryViewModel(
     }
 
     fun updateNewCategoryItem(index: Int, value: String) {
-        _newCategoryItems.value = _newCategoryItems.value.toMutableList().apply {
+        val currentItems = _newCategoryItems.value.toMutableList().apply {
             this[index] = value
         }
+        _newCategoryItems.value = reorganizeItems(currentItems)
+        _visibleItemCount.value = maxOf(1, _newCategoryItems.value.count { it.isNotBlank() })
+    }
+
+    fun addNewItem() {
+        if (_visibleItemCount.value < 5) {
+            _visibleItemCount.value += 1
+        }
+    }
+
+    fun reorganizeAndGetItemCount(items: List<String>): Pair<List<String>, Int> {
+        val reorganizedItems = reorganizeItems(items)
+        val nonEmptyCount = maxOf(1, reorganizedItems.count { it.isNotBlank() })
+        return Pair(reorganizedItems, nonEmptyCount)
     }
 
     private fun clearInputs() {
         _newCategoryName.value = ""
         _newCategoryItems.value = List(5) { "" }
+        _visibleItemCount.value = 1  // リセット時に1つに戻す
     }
 
     suspend fun getCategoryById(id: Int): Category? {

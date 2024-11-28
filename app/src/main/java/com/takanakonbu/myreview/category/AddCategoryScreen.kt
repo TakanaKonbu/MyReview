@@ -30,6 +30,7 @@ fun AddReviewScreen(
 
     val name by viewModel.newCategoryName.collectAsState()
     val items by viewModel.newCategoryItems.collectAsState()
+    val visibleItemCount by viewModel.visibleItemCount.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -42,7 +43,6 @@ fun AddReviewScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // ジャンル入力フィールド
             OutlinedTextField(
                 value = name,
                 onValueChange = { viewModel.updateNewCategoryName(it) },
@@ -57,16 +57,16 @@ fun AddReviewScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 評価項目の追加セクション
             Text(
                 "評価項目の追加(最大5個)" +
                         "\n最低1個は必須(1個のみの例：総合)",
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            items.forEachIndexed { index, item ->
+            // 表示するフォームの数を制御
+            repeat(visibleItemCount) { index ->
                 OutlinedTextField(
-                    value = item,
+                    value = items[index],
                     onValueChange = { viewModel.updateNewCategoryItem(index, it) },
                     placeholder = { Text("評価項目の追加") },
                     modifier = Modifier
@@ -80,9 +80,18 @@ fun AddReviewScreen(
                 )
             }
 
+            // 追加ボタン
+            if (visibleItemCount < 5) {
+                TextButton(
+                    onClick = { viewModel.addNewItem() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("+ 評価項目を追加", color = MainColor.value)
+                }
+            }
+
             Spacer(modifier = Modifier.weight(1f))
 
-            // 保存ボタン
             Button(
                 onClick = {
                     viewModel.insertCategory()
@@ -93,8 +102,6 @@ fun AddReviewScreen(
             ) {
                 Text("保存", color = Color.White, fontSize = 20.sp)
             }
-
-
         }
     }
 }

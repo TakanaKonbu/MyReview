@@ -35,13 +35,32 @@ fun EditCategoryScreen(
     var category by remember { mutableStateOf<Category?>(null) }
     var name by remember { mutableStateOf("") }
     var items by remember { mutableStateOf(List(5) { "" }) }
+    var visibleItemCount by remember { mutableStateOf(1) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+
+    fun updateItem(index: Int, newValue: String) {
+        val currentItems = items.toMutableList().apply {
+            this[index] = newValue
+        }
+        val (reorganizedItems, newVisibleCount) = viewModel.reorganizeAndGetItemCount(currentItems)
+        items = reorganizedItems
+        visibleItemCount = newVisibleCount
+    }
 
     LaunchedEffect(categoryId) {
         category = viewModel.getCategoryById(categoryId)
         category?.let {
             name = it.name
-            items = listOf(it.item1, it.item2 ?: "", it.item3 ?: "", it.item4 ?: "", it.item5 ?: "")
+            val initialItems = listOf(
+                it.item1,
+                it.item2 ?: "",
+                it.item3 ?: "",
+                it.item4 ?: "",
+                it.item5 ?: ""
+            )
+            val (reorganizedItems, initialVisibleCount) = viewModel.reorganizeAndGetItemCount(initialItems)
+            items = reorganizedItems
+            visibleItemCount = initialVisibleCount
         }
     }
 
@@ -86,12 +105,10 @@ fun EditCategoryScreen(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            items.forEachIndexed { index, item ->
+            repeat(visibleItemCount) { index ->
                 OutlinedTextField(
-                    value = item,
-                    onValueChange = { newValue ->
-                        items = items.toMutableList().apply { this[index] = newValue }
-                    },
+                    value = items[index],
+                    onValueChange = { newValue -> updateItem(index, newValue) },
                     label = { Text("評価項目 ${index + 1}") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -103,6 +120,22 @@ fun EditCategoryScreen(
                     singleLine = true
                 )
             }
+
+            if (visibleItemCount < 5) {
+                TextButton(
+                    onClick = {
+                        if (visibleItemCount < 5) {
+                            visibleItemCount++
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("+ 評価項目を追加", color = MainColor.value)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Button(
                 onClick = {
                     category?.let { currentCategory ->
@@ -128,7 +161,6 @@ fun EditCategoryScreen(
         }
     }
 
-    // 削除確認ダイアログ
     if (showDeleteConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmDialog = false },
