@@ -34,8 +34,8 @@ class ReviewViewModel(
 
     private var rewardedAd: RewardedAd? = null
     //    本番広告
-    private val adUnitId = "ca-app-pub-2836653067032260/7608512459"
-//    private val adUnitId = "ca-app-pub-3940256099942544/5224354917"
+//    private val adUnitId = "ca-app-pub-2836653067032260/7608512459"
+    private val adUnitId = "ca-app-pub-3940256099942544/5224354917"
 
     private val _reviews = MutableStateFlow<List<Review>>(emptyList())
     val reviews: StateFlow<List<Review>> = _reviews.asStateFlow()
