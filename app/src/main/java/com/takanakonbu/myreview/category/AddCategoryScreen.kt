@@ -50,9 +50,17 @@ fun AddReviewScreen(
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MainColor.value,
-                    unfocusedBorderColor = Color.Gray
+                    unfocusedBorderColor = Color.Gray,
+                    errorBorderColor = Color.Red,
+                    errorSupportingTextColor = Color.Red
                 ),
-                singleLine = true
+                singleLine = true,
+                isError = name.isEmpty(),
+                supportingText = {
+                    if (name.isEmpty()) {
+                        Text("カテゴリー名は必須です")
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -94,10 +102,13 @@ fun AddReviewScreen(
 
             Button(
                 onClick = {
-                    viewModel.insertCategory()
-                    onNavigateBack()
+                    if (name.isNotEmpty()) {
+                        viewModel.insertCategory()
+                        onNavigateBack()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
+                enabled = name.isNotEmpty(), // 入力が空の場合はボタンを無効化
                 colors = ButtonDefaults.buttonColors(containerColor = MainColor.value)
             ) {
                 Text("保存", color = Color.White, fontSize = 20.sp)
