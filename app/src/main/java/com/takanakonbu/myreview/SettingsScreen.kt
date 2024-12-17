@@ -110,7 +110,7 @@ fun SettingsScreen(
         }
         if (backupCompleted) {
             Text(
-                "バックアップが完了しました。",
+                "バックアップが完了しました",
                 modifier = Modifier.padding(8.dp)
             )
         }
@@ -144,7 +144,7 @@ fun SettingsScreen(
             )
         }
         if (restoreCompleted) {
-            Text("データの復元が完了しました。")
+            Text("データの復元が完了しました")
         }
         HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
 
