@@ -30,6 +30,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -115,7 +116,18 @@ fun AddReviewScreen(
                     onValueChange = { viewModel.setTitle(it) },
                     label = { Text("タイトル") },
                     modifier = Modifier.weight(1f),
-                    singleLine = true
+                    singleLine = true,
+                    isError = title.isEmpty(),
+                    supportingText = {
+                        if (title.isEmpty()) {
+                            Text("タイトルは必須です")
+                        }
+                    },
+                    colors = TextFieldDefaults.colors(
+                        errorIndicatorColor = Color.Red,
+                        errorLabelColor = Color.Red,
+                        errorSupportingTextColor = Color.Red,
+                    )
                 )
                 IconButton(onClick = { viewModel.toggleFavorite() }) {
                     Icon(
@@ -259,12 +271,16 @@ fun AddReviewScreen(
 
             Button(
                 onClick = {
-                    viewModel.saveReview()
-                    onNavigateBack()
+                    if (title.isNotEmpty()) {
+                        viewModel.saveReview()
+                        onNavigateBack()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
+                enabled = title.isNotEmpty(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MainColor.value
+                    containerColor = MainColor.value,
+                    disabledContainerColor = MainColor.value.copy(alpha = 0.5f)
                 )
             ) {
                 Text(if (isEditMode) "更新" else "保存")
