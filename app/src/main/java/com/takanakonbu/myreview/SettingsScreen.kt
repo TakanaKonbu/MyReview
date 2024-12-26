@@ -267,7 +267,7 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "バックアップファイルは必ず「Dropbox」や「GoogleDrive」などのクラウドストレージに保管してください。" +
+            text = "バックアップファイルは必ず「Dropbox」や「GoogleDrive」など、クラウドストレージに保管してください。" +
                     "\n復元先の新たな端末からアクセスできる場所に保管することでデータの復元ができます。" +
                     "\nバックアップデータには個人情報が含まれている可能性があるため、取り扱いには十分注意してください。"
         )
