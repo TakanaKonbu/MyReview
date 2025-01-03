@@ -27,7 +27,7 @@ class CategoryViewModel(
 
     private var rewardedAd: RewardedAd? = null
     //    本番広告
-//    private val adUnitId = "ca-app-pub-2836653067032260/7608512459"
+    //    private val adUnitId = "ca-app-pub-2836653067032260/7608512459"
     private val adUnitId = "ca-app-pub-3940256099942544/5224354917"
 
     val allCategoriesWithReviewCount: StateFlow<List<CategoryWithReviewCount>> = categoryRepository.allCategories
@@ -51,9 +51,12 @@ class CategoryViewModel(
     val visibleItemCount: StateFlow<Int> = _visibleItemCount.asStateFlow()
 
     private fun reorganizeItems(items: List<String>): List<String> {
-        val nonEmptyItems = items.filter { it.isNotBlank() }
-        return List(5) { index ->
-            nonEmptyItems.getOrElse(index) { "" }
+        // 空の文字列も保持したまま返す
+        return items.take(5).toMutableList().apply {
+            // リストのサイズが5未満の場合、空文字列で埋める
+            while (size < 5) {
+                add("")
+            }
         }
     }
 
@@ -67,10 +70,10 @@ class CategoryViewModel(
                 val newCategory = Category(
                     name = name,
                     item1 = items[0],
-                    item2 = items[1].takeIf { it.isNotBlank() },
-                    item3 = items[2].takeIf { it.isNotBlank() },
-                    item4 = items[3].takeIf { it.isNotBlank() },
-                    item5 = items[4].takeIf { it.isNotBlank() },
+                    item2 = items[1].ifBlank { null },
+                    item3 = items[2].ifBlank { null },
+                    item4 = items[3].ifBlank { null },
+                    item5 = items[4].ifBlank { null },
                     createdDate = Date()
                 )
                 categoryRepository.insertCategory(newCategory)
@@ -96,7 +99,10 @@ class CategoryViewModel(
             this[index] = value
         }
         _newCategoryItems.value = reorganizeItems(currentItems)
-        _visibleItemCount.value = maxOf(1, _newCategoryItems.value.count { it.isNotBlank() })
+
+        // 表示する項目数を更新
+        // 最低1つは表示し、その後は最後に入力された項目まで表示する
+        _visibleItemCount.value = maxOf(1, currentItems.indexOfLast { it.isNotBlank() } + 1)
     }
 
     fun addNewItem() {
@@ -107,8 +113,9 @@ class CategoryViewModel(
 
     fun reorganizeAndGetItemCount(items: List<String>): Pair<List<String>, Int> {
         val reorganizedItems = reorganizeItems(items)
-        val nonEmptyCount = maxOf(1, reorganizedItems.count { it.isNotBlank() })
-        return Pair(reorganizedItems, nonEmptyCount)
+        // 少なくとも1つは表示し、その後は最後に入力された項目まで表示
+        val visibleCount = maxOf(1, items.indexOfLast { it.isNotBlank() } + 1)
+        return Pair(reorganizedItems, visibleCount)
     }
 
     private fun clearInputs() {
